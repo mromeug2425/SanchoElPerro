@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\UsuariosMejoras;
 use Illuminate\Database\Eloquent\Model;
 
 class Usuario extends Model
@@ -14,8 +15,8 @@ class Usuario extends Model
         return $this->hasMany(Sesiones::class, 'id');
     }
 
-    public function usuarios_mejoras() {
-        return $this->belongsToMany(Mejoras::class, 'usuarios_mejoras', 'id_usuario', 'id_mejora');
+    public function usuariosAUsuariosMejoras() {
+        return $this->hasMany(UsuariosMejoras::class, 'id_usuario');
     }
     
 }
