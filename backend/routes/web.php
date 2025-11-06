@@ -5,9 +5,7 @@ use App\Http\Controllers\NavigationController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [NavigationController::class, 'register'])->name('home');
 
 Route::get('/tienda', [NavigationController::class, 'tienda'])->name('tienda');
 // Autenticación: login / logout

@@ -10,4 +10,9 @@ class NavigationController extends Controller
     {
         return view('tienda');
     }
+
+    public function register()
+    {
+        return view('register');
+    }
 }
