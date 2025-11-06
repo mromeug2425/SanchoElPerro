@@ -1,27 +1,19 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
+@extends('layouts.app')
 
-		<title>{{ config('app.name', 'SanchoElPerro') }} - Tienda</title>
-		
-		<!-- Tailwind CDN (page-scoped) -->
-		<script src="https://cdn.tailwindcss.com"></script>
-		<script>
-			// Optional: minimal page-scoped Tailwind config
-			tailwind.config = {
-				theme: {
-					extend: {},
-				},
-			};
-		</script>
-	</head>
-	<body class="bg-[#FDFDFC] text-[#1b1b18] min-h-screen max-h-screen">
+@section('title', config('app.name', 'SanchoElPerro') . ' - Tienda')
 
-		<main class="container mx-auto p-6">
-			<h1 class="text-2xl font-bold mb-4">Tienda</h1>
+@php
+	$backgroundImage = asset('img/backgrounds/tienda.png');
+@endphp
+
+@section('content')
+	<div class="w-full h-full flex flex-col p-8">
+		<main class="flex-1 flex items-center justify-center">
+			<div class="text-center">
+				
+			</div>
 		</main>
-	</body>
-</html>
+
+	</div>
+@endsection
 
