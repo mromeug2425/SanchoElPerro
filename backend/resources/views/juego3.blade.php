@@ -15,7 +15,7 @@
 		<!-- Botón Atrás -->
 		<div class="absolute top-4 left-4 z-20">
 			<a href="{{ route('home') }}" 
-			   class="bg-gray-800 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-full shadow-lg uppercase tracking-wider text-sm transition-all duration-200 hover:scale-105">
+			class="bg-gray-800 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-full shadow-lg uppercase tracking-wider text-sm transition-all duration-200 hover:scale-105">
 				Atrás
 			</a>
 		</div>
