@@ -4,7 +4,7 @@ namespace App\Models;
 
 
 use App\Models\Juegos;
-use App\Models\SesionesJuegosPreguntas;
+use App\Models\SesionesJuegos;
 use Illuminate\Database\Eloquent\Model;
 
 class Preguntas extends Model
@@ -14,11 +14,11 @@ class Preguntas extends Model
     protected $primaryKey = 'id';
     public $timestamps = false;
 
-    public function preguntasAJuegos() {
-        return $this->belongsTo(Juegos::class, 'id');
+    public function juego() {
+        return $this->belongsTo(Juegos::class, 'id_juego');
     }
 
-    public function preguntasASesionJuegosPreguntas() {
-        return $this->belongsTo(SesionesJuegosPreguntas::class, 'id_pregunta');
+    public function sesionesJuegos() {
+        return $this->belongsTo(SesionesJuegos::class, 'id_pregunta');
     }
 }
