@@ -10,4 +10,12 @@ class UsuariosMejoras extends Model
     protected $table = 'usuarios_mejoras';
     protected $primaryKey = 'id';
     public $timestamps = false;
+
+    public function mejoras() {
+        return $this->hasOne(Mejoras::class, 'id_usuarios');
+    }
+
+    public function usuarios() {
+        return $this->belongsTo(Usuario::class, 'id');
+    }
 }
