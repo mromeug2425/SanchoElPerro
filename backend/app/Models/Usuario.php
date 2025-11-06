@@ -15,7 +15,7 @@ class Usuario extends Model
         return $this->hasMany(Sesiones::class, 'id');
     }
 
-    public function usuariosAUsuariosMejoras() {
+    public function uusuariosMejoras() {
         return $this->hasMany(UsuariosMejoras::class, 'id_usuario');
     }
     
