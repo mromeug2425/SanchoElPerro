@@ -5,9 +5,16 @@ use App\Http\Controllers\NavigationController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 
-Route::get('/', [NavigationController::class, 'register'])->name('home');
+Route::get('/', [NavigationController::class, 'home'])->name('home');
 
 Route::get('/tienda', [NavigationController::class, 'tienda'])->name('tienda');
+
+// Juegos
+Route::get('/juego1', [NavigationController::class, 'juego1'])->name('juego1');
+Route::get('/juego2', [NavigationController::class, 'juego2'])->name('juego2');
+Route::get('/juego3', [NavigationController::class, 'juego3'])->name('juego3');
+Route::get('/juego4', [NavigationController::class, 'juego4'])->name('juego4');
+
 // Autenticación: login / logout
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
