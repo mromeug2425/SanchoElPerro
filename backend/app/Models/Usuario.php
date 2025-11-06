@@ -3,9 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as ModeAuthenticatable;
 
-class Usuario extends Model
+class Usuario extends ModeAuthenticatable
 {
+    use HasFactory, Notifiable;
+
     protected $table = 'usuarios';
     protected $primaryKey = 'id';
     public $timestamps = false;
@@ -14,8 +19,8 @@ class Usuario extends Model
         return $this->hasMany(Sesiones::class, 'id');
     }
 
-    public function usuarios_mejoras() {
-        return $this->belongsToMany(Mejoras::class, 'usuarios_mejoras', 'id_usuario', 'id_mejora');
+    public function usuariosMejoras() {
+        return $this->hasMany(UsuariosMejoras::class, 'id_usuario');
     }
     
 }
