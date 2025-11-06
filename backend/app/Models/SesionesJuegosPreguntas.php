@@ -13,7 +13,7 @@ class SesionesJuegosPreguntas extends Model
     public $timestamps = false;
 
     public function preguntas(){
-        return $this->hasOne(Preguntas::class, 'pregunta');
+        return $this->hasOne(Preguntas::class, 'id_pregunta');
     }
 
     public function sesionesJuegos() {
