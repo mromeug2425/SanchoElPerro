@@ -12,7 +12,7 @@ class UsuariosMejoras extends Model
     public $timestamps = false;
 
     public function mejoras() {
-        return $this->hasOne(Mejoras::class, 'id');
+        return $this->hasOne(Mejoras::class, 'id_usuarios');
     }
 
     public function usuarios() {
