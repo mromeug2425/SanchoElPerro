@@ -24,24 +24,25 @@
 				<div class="text-center w-full justify-between flex items-center">
 					<div class="text-center flex gap-4">
 						<div class="text-center flex flex-col gap-4">
-							<x-boton color="blue" text="23" height="large" />
-							<x-boton text="2" height="large" />
-							<x-boton color="green" text="4" height="large" />
-							<x-boton color="red" text="5" height="large" />
+							<x-boton color="#347E2B" text="23" height="large" />
+							<x-boton color="#347E2B" text="2" height="large" />
+							<x-boton color="#347E2B" text="4" height="large" />
+							<x-boton color="#347E2B" text="5" height="large" />
 						</div>
 						<div class="text-center flex flex-col gap-4">
-							<x-boton color="blue" text="x" height="large" />
-							<x-boton text="+" height="large" />
-							<x-boton color="blue" text="-" height="large" />
+							<x-boton color="#0C3826" text="x" height="large" />
+							<x-boton color="#0C3826"text="+" height="large" />
+							<x-boton color="#0C3826" text="-" height="large" />
 						</div>
 					</div>
 					<div class="text-center flex gap-4">
 						<div class="text-center flex flex-col gap-4">
-							<x-dialogo bg_color="#D9D9D9" border_color="#000000" text="2x14-5" />
-							<x-boton text="Submit" height="large" />
+							<x-dialogo bg_color="#3C3B4F" border_color="#000000" text="2x14-5" />
+							<x-boton color="#3C3B4F" text="Submit" height="large" />
 						</div>
 						<div class="text-center flex flex-col gap-4">
-							<x-dialogo bg_color="#D9D9D9" border_color="#000000" text="" />
+							<x-dialogo bg_color="#3C3B4F" border_color="#000000" text="100" />
+							<x-dialogo bg_color="#3C3B4F" border_color="#000000" text="25" />
 						</div>
 						<div class="text-center flex flex-col gap-4">
 							<div class="flex flex-col items-center">
