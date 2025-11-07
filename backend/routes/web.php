@@ -9,6 +9,8 @@ Route::get('/', [NavigationController::class, 'home'])->name('home');
 
 Route::get('/tienda', [NavigationController::class, 'tienda'])->name('tienda');
 
+Route::get('/niveles', [NavigationController::class, 'niveles'])->name('niveles');
+
 // Juegos
 Route::get('/juego1', [NavigationController::class, 'juego1'])->name('juego1');
 Route::get('/juego2', [NavigationController::class, 'juego2'])->name('juego2');
