@@ -21,5 +21,15 @@
 				<!-- Contenido del Juego 3 -->
 			</div>
 		</main>
+
+		<!-- Botones en la parte inferior -->
+		<div class="w-full max-w-full p-4">
+			<div class="grid grid-cols-2 gap-4">
+				<x-boton color="blue" text="Texto del botón" height="large" />
+				<x-boton text="Guardar" height="large" />
+				<x-boton color="green" text="Aceptar" height="large" />
+				<x-boton color="red" text="Eliminar" height="large" />
+			</div>
+		</div>
 	</div>
 @endsection

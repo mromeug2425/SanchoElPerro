@@ -18,7 +18,6 @@
 
 		<main class="flex-1 flex items-center justify-center">
 			<div class="animate-fade-in-scale">
-				<!-- Contenido del Juego 4 -->
 			</div>
 		</main>
 	</div>

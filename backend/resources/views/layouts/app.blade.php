@@ -6,11 +6,19 @@
 
 		<title>@yield('title', config('app.name', 'SanchoElPerro'))</title>
 		
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap" rel="stylesheet">
+		
 		<script src="https://cdn.tailwindcss.com"></script>
 		<script>
 			tailwind.config = {
 				theme: {
-					extend: {},
+					extend: {
+						fontFamily: {
+							'jersey': ['"Jersey 10"', 'cursive'],
+						},
+					},
 				},
 			};
 		</script>
