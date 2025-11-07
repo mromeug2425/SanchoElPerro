@@ -27,6 +27,7 @@ CREATE TABLE usuarios (
     password NVARCHAR(255) NOT NULL,
     edad SMALLINT NOT NULL,
     trabajo NVARCHAR(255) NOT NULL,
+    tiquets_tienda INT NOT NULL,
     monedas BIGINT NOT NULL DEFAULT 0,
     monedas_gastadas BIGINT NOT NULL DEFAULT 0,
     createdAt DATETIME NOT NULL DEFAULT GETDATE(),
@@ -141,18 +142,9 @@ GO
 PRINT 'Base de datos SanchoElPerro creada exitosamente';
 GO
 
--- ============================================================================
--- INSERCIÓN DE DATOS INICIALES
--- ============================================================================
-
--- Insertar juegos de ejemplo
 INSERT INTO juegos (nombre, tiempo, cantidad_preguntas) VALUES
-('Geometría Cangur', '00:15:00', 50);
+('Juego 3', '00:15:00', 10);
 GO
-
--- Inserción de 50 preguntas de geometría estilo Cangur para SQL Server
--- Esquema: id (BIGINT IDENTITY), id_juego (BIGINT), pregunta (NVARCHAR), opcion_1 (NVARCHAR), 
---          opcion_2 (NVARCHAR), opcion_3 (NVARCHAR), opcion_4 (NVARCHAR), answer (SMALLINT), media (NVARCHAR)
 
 INSERT INTO preguntas (id_juego, pregunta, opcion_1, opcion_2, opcion_3, opcion_4, answer, media) VALUES
 (1, '¡Tío/a! Estoy haciendo una cometa y necesito 3 triángulos iguales. Si cada triángulo tiene 3 ángulos, ¿cuántos ángulos hay en total?', '3', '6', '9', '12', 3, NULL),
