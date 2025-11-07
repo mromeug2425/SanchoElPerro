@@ -6,11 +6,19 @@
 
 		<title>@yield('title', config('app.name', 'SanchoElPerro'))</title>
 		
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap" rel="stylesheet">
+		
 		<script src="https://cdn.tailwindcss.com"></script>
 		<script>
 			tailwind.config = {
 				theme: {
-					extend: {},
+					extend: {
+						fontFamily: {
+							'jersey': ['"Jersey 10"', 'cursive'],
+						},
+					},
 				},
 			};
 		</script>
@@ -21,17 +29,14 @@
 		<div class="min-h-screen w-full flex items-center justify-center p-4">
 			<div class="relative mx-auto">
 				@if(isset($backgroundImage) && $backgroundImage)
-					{{-- Background image that dictates the container size --}}
 					<img src="{{ $backgroundImage }}" 
 						alt="Background" 
 						class="w-full h-auto max-w-full rounded-lg shadow-2xl">
 					
-					{{-- Content layer positioned over the image --}}
 					<div class="absolute inset-0 z-10">
 						@yield('content')
 					</div>
 				@else
-					{{-- Fallback if no background image --}}
 					<div class="w-full min-h-screen">
 						@yield('content')
 					</div>

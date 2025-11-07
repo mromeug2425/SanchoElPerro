@@ -6,10 +6,6 @@
 	$backgroundImage = asset('img/backgrounds/home.png');
 @endphp
 
-@push('styles')
-<link rel="stylesheet" href="{{ asset('css/home.css') }}">
-@endpush
-
 @section('content')
 	<div class="w-full h-full flex flex-col items-center justify-end p-4 pb-32">
 		<main class="flex flex-col items-center space-y-8">
