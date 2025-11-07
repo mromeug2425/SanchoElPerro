@@ -6,10 +6,6 @@
 	$backgroundImage = asset('img/backgrounds/joc1.png');
 @endphp
 
-@push('styles')
-<link rel="stylesheet" href="{{ asset('css/juegos.css') }}">
-@endpush
-
 @section('content')
 	<div class="w-full h-full flex flex-col p-4">
 		<!-- Botón Atrás -->
@@ -22,7 +18,6 @@
 
 		<main class="flex-1 flex items-center justify-center">
 			<div class="animate-fade-in-scale">
-				<!-- Contenido del Juego 1 -->
 			</div>
 		</main>
 	</div>
