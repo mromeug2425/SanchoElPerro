@@ -19,10 +19,6 @@
 		<main class="flex-1 flex items-center justify-center">
 			<div class="animate-fade-in-scale">
 			</div>
-
-			<div>
-				<x-boton color="amber" text="Marrón Claro" size="lg" />
-			</div>
 		</main>
 	</div>
 @endsection
