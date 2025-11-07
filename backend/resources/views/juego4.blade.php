@@ -6,10 +6,6 @@
 	$backgroundImage = asset('img/backgrounds/joc4.png');
 @endphp
 
-@push('styles')
-<link rel="stylesheet" href="{{ asset('css/juegos.css') }}">
-@endpush
-
 @section('content')
 	<div class="w-full h-full flex flex-col p-4">
 		<!-- Botón Atrás -->
