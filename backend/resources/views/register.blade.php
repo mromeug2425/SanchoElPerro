@@ -6,10 +6,6 @@
 	$backgroundImage = asset('img/backgrounds/landing.png');
 @endphp
 
-@push('styles')
-<link rel="stylesheet" href="{{ asset('css/register.css') }}">
-@endpush
-
 @section('content')
 	<div class="w-full h-full flex flex-col p-4">
 		<!-- Botón Atrás -->
