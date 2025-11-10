@@ -96,6 +96,9 @@ CREATE TABLE sesiones_juegos_preguntas (
     id_sesion_juegos BIGINT NOT NULL,
     id_pregunta BIGINT NOT NULL,
     acertada BIT NOT NULL,
+    respuesta_usuario TEXT NOT NULL,
+    respuesta_correcta TEXT NOT NULL,
+    opciones TEXT NULL,
     CONSTRAINT sesiones_juegos_preguntas_id_primary PRIMARY KEY (id),
     CONSTRAINT sesiones_juegos_preguntas_id_sesion_juegos_foreign FOREIGN KEY (id_sesion_juegos) REFERENCES sesiones_juegos(id) ON DELETE CASCADE,
     CONSTRAINT sesiones_juegos_preguntas_id_pregunta_foreign FOREIGN KEY (id_pregunta) REFERENCES preguntas(id)
