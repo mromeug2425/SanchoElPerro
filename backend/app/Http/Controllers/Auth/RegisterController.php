@@ -58,17 +58,22 @@ class RegisterController extends Controller
         $request->session()->regenerate();
 
         // Crear una nueva sesión usando Eloquent
+        $currentDateTime = Carbon::now()->toDateTimeString();
+        
         $sesion = new Sesiones();
         $sesion->id_usuario = $user->id;
         $sesion->duracion = null;
         $sesion->monedas_gastadas = 0;
         // Guardar como string en formato SQL Server DATETIME (Y-m-d H:i:s)
-        $sesion->createdAt = Carbon::now()->toDateTimeString();
+        $sesion->createdAt = $currentDateTime;
         
         $sesion->timestamps = false;
         $sesion->save();
 
-        session(['current_sesion_id' => $sesion->id]);
+        session([
+            'current_sesion_id' => $sesion->id,
+            'sesion_created_at' => $currentDateTime,
+        ]);
 
         return view('home');
     }

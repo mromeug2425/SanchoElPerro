@@ -95,7 +95,11 @@ class LoginController extends Controller
 				'createdAt_saved' => $sesion->createdAt,
 			]);
 
-			session(['current_sesion_id' => $sesion->id]);
+			// Guardar el tiempo REAL de creación en la sesión de Laravel (no confiar en DB)
+			session([
+				'current_sesion_id' => $sesion->id,
+				'sesion_created_at' => $currentDateTime,
+			]);
 
 			return redirect()->route('home');
 		}
@@ -112,49 +116,54 @@ class LoginController extends Controller
 			$sesion = Sesiones::find($sesionId);
 			
 			if ($sesion) {
-				// Asegurar que ambas fechas usan el mismo formato
-				$createdAt = Carbon::createFromFormat('Y-m-d H:i:s', substr($sesion->createdAt, 0, 19));
-				$now = Carbon::now();
+				// Usar el tiempo REAL de la sesión de Laravel, no el de la base de datos
+				$realCreatedAt = session('sesion_created_at');
 				
-				// DEBUG: Ver los valores
-				Log::info('Logout Debug', [
-					'sesion_id' => $sesion->id,
-					'createdAt_raw' => $sesion->createdAt,
-					'createdAt' => $createdAt->toDateTimeString(),
-					'now' => $now->toDateTimeString(),
-				]);
-				
-				// Calcular la duración total en segundos (absoluto para evitar negativos)
-				$totalSeconds = abs($createdAt->diffInSeconds($now));
-				
-				Log::info('Duration Calculation', [
-					'totalSeconds' => $totalSeconds,
-				]);
-				
-				// Convertir a horas, minutos y segundos
-				$hours = intval($totalSeconds / 3600);
-				$minutes = intval(($totalSeconds % 3600) / 60);
-				$seconds = intval($totalSeconds % 60);
-				
-				Log::info('Time Components', [
-					'hours' => $hours,
-					'minutes' => $minutes,
-					'seconds' => $seconds,
-				]);
-				
-				// SQL Server TIME solo soporta hasta 23:59:59
-				if ($hours > 23) {
-					$durationString = '23:59:59';
-				} else {
-					$durationString = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+				if ($realCreatedAt) {
+					$createdAt = Carbon::createFromFormat('Y-m-d H:i:s', $realCreatedAt);
+					$now = Carbon::now();
+					
+					// DEBUG: Ver los valores
+					Log::info('Logout Debug', [
+						'sesion_id' => $sesion->id,
+						'createdAt_from_laravel_session' => $createdAt->toDateTimeString(),
+						'createdAt_from_database' => $sesion->createdAt,
+						'now' => $now->toDateTimeString(),
+					]);
+					
+					// Calcular la diferencia en segundos (SIEMPRE positivo con abs)
+					$totalSeconds = abs($now->diffInSeconds($createdAt));
+					
+					Log::info('Duration Calculation', [
+						'totalSeconds' => $totalSeconds,
+					]);
+					
+					// Convertir a horas, minutos y segundos
+					$hours = intval(abs($totalSeconds / 3600));
+					$minutes = intval(abs(($totalSeconds % 3600) / 60));
+					$seconds = intval(abs($totalSeconds % 60));
+					
+					Log::info('Time Components', [
+						'hours' => $hours,
+						'minutes' => $minutes,
+						'seconds' => $seconds,
+					]);
+					
+					// SQL Server TIME solo soporta hasta 23:59:59
+					if ($hours > 23) {
+						$durationString = '23:59:59';
+					} else {
+						$durationString = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+					}
+					
+					Log::info('Final Duration', ['duration' => $durationString]);
+					
+					$sesion->duracion = $durationString;
+					$sesion->save();
 				}
-				
-				Log::info('Final Duration', ['duration' => $durationString]);
-				
-				$sesion->duracion = $durationString;
-				$sesion->save();
 			}
 			session()->forget('current_sesion_id');
+			session()->forget('sesion_created_at');
 		}
 
 		Auth::logout();
