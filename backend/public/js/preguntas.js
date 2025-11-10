@@ -1,5 +1,8 @@
 let preguntas = [];
 let preguntaActual = 0;
+let tiempoLimite = 15; // Tiempo por defecto
+let tiempoRestante = 15;
+let intervaloTimer = null;
 
 // Cargar preguntas al iniciar la página
 document.addEventListener('DOMContentLoaded', function() {
@@ -14,6 +17,7 @@ async function cargarPreguntas(idJuego = 1) {
         }
         const data = await response.json();
         preguntas = data.preguntas || data; // Soporte para ambos formatos
+        tiempoLimite = data.tiempo || 15; // Obtener el tiempo de la BD
         
         if (preguntas.length > 0) {
             mostrarPregunta(0);
@@ -23,6 +27,66 @@ async function cargarPreguntas(idJuego = 1) {
     } catch (error) {
         console.error('Error:', error);
     }
+}
+
+function iniciarTimer() {
+    // Limpiar timer anterior si existe
+    if (intervaloTimer) {
+        clearInterval(intervaloTimer);
+    }
+    
+    // Resetear tiempo
+    tiempoRestante = tiempoLimite;
+    actualizarDisplayTimer();
+    
+    // Iniciar contador regresivo
+    intervaloTimer = setInterval(() => {
+        tiempoRestante--;
+        actualizarDisplayTimer();
+        
+        // Cambiar color cuando queda poco tiempo
+        const timerElement = document.getElementById('tiempo-restante');
+        if (tiempoRestante <= 5) {
+            timerElement.style.color = '#ef4444'; // Rojo
+        } else {
+            timerElement.style.color = '#966E31'; // Color original
+        }
+        
+        // Si se acaba el tiempo
+        if (tiempoRestante <= 0) {
+            clearInterval(intervaloTimer);
+            tiempoAgotado();
+        }
+    }, 1000);
+}
+
+function actualizarDisplayTimer() {
+    const timerElement = document.getElementById('tiempo-restante');
+    if (timerElement) {
+        timerElement.textContent = tiempoRestante;
+    }
+}
+
+function tiempoAgotado() {
+    // Deshabilitar botones
+    deshabilitarBotones();
+    
+    // Mostrar popup de tiempo agotado
+    mostrarPopup('¡TIEMPO AGOTADO!', 'Se acabó el tiempo para responder esta pregunta.', false);
+}
+
+function deshabilitarBotones() {
+    document.getElementById('opcion1').disabled = true;
+    document.getElementById('opcion2').disabled = true;
+    document.getElementById('opcion3').disabled = true;
+    document.getElementById('opcion4').disabled = true;
+}
+
+function habilitarBotones() {
+    document.getElementById('opcion1').disabled = false;
+    document.getElementById('opcion2').disabled = false;
+    document.getElementById('opcion3').disabled = false;
+    document.getElementById('opcion4').disabled = false;
 }
 
 function mostrarPregunta(index) {
@@ -46,9 +110,19 @@ function mostrarPregunta(index) {
     document.getElementById('opcion2').textContent = pregunta.opcion_2;
     document.getElementById('opcion3').textContent = pregunta.opcion_3;
     document.getElementById('opcion4').textContent = pregunta.opcion_4;
+    
+    // Habilitar botones y iniciar timer
+    habilitarBotones();
+    iniciarTimer();
 }
 
 function verificarRespuesta(opcionSeleccionada) {
+    // Detener el timer
+    clearInterval(intervaloTimer);
+    
+    // Deshabilitar botones para evitar múltiples clics
+    deshabilitarBotones();
+    
     const pregunta = preguntas[preguntaActual];
     
     if (pregunta.answer === opcionSeleccionada) {

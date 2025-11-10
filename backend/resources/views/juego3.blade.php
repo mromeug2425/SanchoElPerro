@@ -18,12 +18,18 @@
 
 		<!-- Marco de texto con el componente dialogo debajo del botón atrás -->
 		<div class="absolute top-20 left-1/2 transform -translate-x-1/2 z-10 max-w-2xl w-full px-4">
-			<div id="dialogo-pregunta">
-				<x-dialogo 
-					bg_color="white" 
-					border_color="brown" 
-					text="" 
-				/>
+			<div class="flex items-center gap-4">
+				<div id="dialogo-pregunta" class="flex-1">
+					<x-dialogo 
+						bg_color="white" 
+						border_color="brown" 
+						text="" 
+					/>
+				</div>
+				<div id="timer" class="bg-white border-2 border-brown rounded-xl shadow-md px-6 py-4 text-center">
+					<div class="text-sm font-jersey text-gray-600">TIEMPO</div>
+					<div id="tiempo-restante" class="text-4xl font-bold font-jersey text-[#966E31]">15</div>
+				</div>
 			</div>
 		</div>
 
