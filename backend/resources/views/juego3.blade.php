@@ -43,6 +43,18 @@
 		</div>
 	</div>
 
+	<!-- Popup personalizado -->
+	<div id="popup-resultado" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+		<div class="absolute inset-0 bg-black opacity-50"></div>
+		<div class="relative bg-white border-4 rounded-xl shadow-2xl p-8 max-w-md mx-4 transform transition-all duration-300 scale-95" id="popup-contenido">
+			<h2 id="popup-titulo" class="text-3xl font-bold mb-4 text-center font-jersey"></h2>
+			<p id="popup-mensaje" class="text-lg text-center mb-6 font-jersey"></p>
+			<button onclick="cerrarPopup()" class="w-full bg-[#966E31] hover:brightness-75 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 hover:scale-95 font-jersey">
+				Continuar
+			</button>
+		</div>
+	</div>
+
 	<script src="{{ asset('js/preguntas.js') }}"></script>
 @endsection
 
