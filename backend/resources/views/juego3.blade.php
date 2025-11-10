@@ -16,6 +16,15 @@
 			</a>
 		</div>
 
+		<!-- Marco de texto con el componente dialogo debajo del botón atrás -->
+		<div class="absolute top-20 left-1/2 transform -translate-x-1/2 z-10 max-w-2xl w-full px-4">
+			<x-dialogo 
+				bg_color="white" 
+				border_color="brown" 
+				text="Aquí va el texto del diálogo para el juego 3. Puedes personalizar este mensaje según las necesidades del juego." 
+			/>
+		</div>
+
 		<main class="flex-1 flex items-center justify-center">
 			<div class="animate-fade-in-scale">
 				<!-- Contenido del Juego 3 -->
@@ -25,10 +34,10 @@
 		<!-- Botones en la parte inferior -->
 		<div class="w-full max-w-full p-4">
 			<div class="grid grid-cols-2 gap-4">
-				<x-boton color="blue" text="Texto del botón" height="large" />
-				<x-boton text="Guardar" height="large" />
-				<x-boton color="green" text="Aceptar" height="large" />
-				<x-boton color="red" text="Eliminar" height="large" />
+				<x-boton color="#966E31" text="Texto del botón" height="large"/>
+				<x-boton color="#572009" text="#572009" height="large" />
+				<x-boton color="#814113" text="Aceptar" height="large" />
+				<x-boton color="#96601A" text="Eliminar" height="large" />
 			</div>
 		</div>
 	</div>
