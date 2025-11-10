@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Usuario;
 use App\Models\Sesiones;
+use Carbon\Carbon;
 
 class RegisterController extends Controller
 {
@@ -56,15 +57,17 @@ class RegisterController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        // Crear una nueva sesión en la tabla sesiones
+        // Crear una nueva sesión usando Eloquent
         $sesion = new Sesiones();
         $sesion->id_usuario = $user->id;
         $sesion->duracion = null;
         $sesion->monedas_gastadas = 0;
-        $sesion->createdAt = now();
+        // Guardar como string en formato SQL Server DATETIME (Y-m-d H:i:s)
+        $sesion->createdAt = Carbon::now()->toDateTimeString();
+        
+        $sesion->timestamps = false;
         $sesion->save();
 
-        // Guardar el ID de la sesión en la sesión de Laravel para usarlo al cerrar sesión
         session(['current_sesion_id' => $sesion->id]);
 
         return view('home');
