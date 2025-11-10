@@ -12,7 +12,8 @@ async function cargarPreguntas(idJuego = 1) {
         if (!response.ok) {
             throw new Error('Error al cargar las preguntas');
         }
-        preguntas = await response.json();
+        const data = await response.json();
+        preguntas = data.preguntas || data; // Soporte para ambos formatos
         
         if (preguntas.length > 0) {
             mostrarPregunta(0);
@@ -33,10 +34,11 @@ function mostrarPregunta(index) {
     const pregunta = preguntas[index];
     preguntaActual = index;
 
-    // Actualizar el texto del diálogo con la pregunta
+    // Actualizar el texto del diálogo con la pregunta y el contador
     const dialogoTexto = document.querySelector('#dialogo-pregunta p');
     if (dialogoTexto) {
-        dialogoTexto.textContent = pregunta.pregunta;
+        const contador = `Pregunta ${index + 1}/${preguntas.length}`;
+        dialogoTexto.textContent = `${contador} - ${pregunta.pregunta}`;
     }
 
     // Actualizar los botones con las opciones
