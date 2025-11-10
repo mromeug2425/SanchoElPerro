@@ -6,9 +6,7 @@ use App\Models\Juegos;
 use App\Models\Preguntas;
 
 
-class PreguntasController extends Controller
-    {
-        // Devuelve un conjunto de preguntas aleatorias para un juego específico
+class PreguntasController extends Controller{
     public function preguntasMostradas($id_juego = 1){
 
         $juego = Juegos::where('id', $id_juego)->first();
