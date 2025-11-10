@@ -16,7 +16,7 @@ class PreguntasController extends Controller
             ->limit(5)
             ->get();
 
-        return response()->$preguntas;
+        return response()->json($preguntas);
     }
     
 }
