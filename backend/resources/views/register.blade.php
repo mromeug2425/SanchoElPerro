@@ -46,17 +46,30 @@
 						</div>
 
 						<div class="animate-slide-up" style="animation-delay: 0.3s;">
-							<label for="email" class="block text-black font-bold mb-1 uppercase text-xs tracking-wide">Email</label>
+							<label for="edad" class="block text-black font-bold mb-1 uppercase text-xs tracking-wide">Edad</label>
 							<input 
-								id="email" 
-								name="email" 
-								type="email" 
-								value="{{ old('email') }}" 
+								id="edad" 
+								name="edad" 
+								type="number" 
+								value="{{ old('edad') }}" 
 								required
+								min="1"
+								max="120"
 								class="w-full px-3 py-2 rounded-lg bg-white border-2 border-gray-300 focus:border-black focus:outline-none text-gray-800 text-sm transition-transform duration-200 focus:scale-[1.02]">
 						</div>
 
 						<div class="animate-slide-up" style="animation-delay: 0.4s;">
+							<label for="trabajo" class="block text-black font-bold mb-1 uppercase text-xs tracking-wide">Trabajo</label>
+							<input 
+								id="trabajo" 
+								name="trabajo" 
+								type="text" 
+								value="{{ old('trabajo') }}" 
+								required
+								class="w-full px-3 py-2 rounded-lg bg-white border-2 border-gray-300 focus:border-black focus:outline-none text-gray-800 text-sm transition-transform duration-200 focus:scale-[1.02]">
+						</div>
+
+						<div class="animate-slide-up" style="animation-delay: 0.5s;">
 							<label for="password" class="block text-black font-bold mb-1 uppercase text-xs tracking-wide">Contraseña</label>
 							<input 
 								id="password" 
@@ -66,7 +79,7 @@
 								class="w-full px-3 py-2 rounded-lg bg-white border-2 border-gray-300 focus:border-black focus:outline-none text-gray-800 text-sm transition-transform duration-200 focus:scale-[1.02]">
 						</div>
 
-						<div class="animate-slide-up" style="animation-delay: 0.5s;">
+						<div class="animate-slide-up" style="animation-delay: 0.6s;">
 							<label for="password_confirmation" class="block text-black font-bold mb-1 uppercase text-xs tracking-wide">Confirmar Contraseña</label>
 							<input 
 								id="password_confirmation" 
@@ -79,12 +92,12 @@
 						<button 
 							type="submit" 
 							class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg uppercase tracking-wider border-2 border-green-800 text-sm transition-all duration-200 hover:scale-105 active:scale-95 animate-slide-up"
-							style="animation-delay: 0.6s;">
+							style="animation-delay: 0.7s;">
 							Registrarse
 						</button>
 					</form>
 
-					<p class="text-center text-black mt-4 text-xs font-semibold animate-slide-up" style="animation-delay: 0.7s;">
+					<p class="text-center text-black mt-4 text-xs font-semibold animate-slide-up" style="animation-delay: 0.8s;">
 						¿Ya tienes cuenta? 
 						<a href="{{ route('login') }}" class="text-blue-800 hover:text-blue-600 font-bold underline transition-colors duration-200">
 							Inicia sesión
