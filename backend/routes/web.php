@@ -29,4 +29,4 @@ Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
-Route::get('preguntas', [PreguntasController::class, 'preguntasMostradas']);
+Route::get('preguntas/{id_juego?}', [PreguntasController::class, 'preguntasMostradas']);
