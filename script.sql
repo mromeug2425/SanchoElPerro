@@ -146,7 +146,7 @@ PRINT 'Base de datos SanchoElPerro creada exitosamente';
 GO
 
 INSERT INTO juegos (nombre, tiempo, cantidad_preguntas) VALUES
-('Juego 3', '00:15:00', 10);
+('Juego 3', '00:15:00', 5);
 GO
 
 INSERT INTO preguntas (id_juego, pregunta, opcion_1, opcion_2, opcion_3, opcion_4, answer, media) VALUES
