@@ -32,7 +32,7 @@
 		<main class="flex-1 flex flex-col items-center justify-start pt-8 px-8">
 			<!-- Sección Superior: Diálogos -->
 			<div class="w-full max-w-4xl flex gap-4 mb-12">
-		<!-- Diálogo 1: Pregunta (más grande) -->
+		<!-- Diálogo 1-->
 			<div class="flex-[3]">
 				<x-dialogo 
 					bg_color="#6B7FBF" 
@@ -42,7 +42,7 @@
 			text_color="white" 
 				/>
 			</div>
-			<!-- Diálogo 2: Timer (cuadrado pequeño) -->
+			<!-- Diálogo 2: Timer -->
 			<div class="w-32 h-32 flex items-center justify-center">
 				<x-dialogo 
 					bg_color="#D4A574" 
@@ -53,7 +53,7 @@
 				/>
 		</div>
 	</div>
-		<!-- Sección Central: Botones de Respuesta (más abajo) -->
+		
 		<div class="w-full max-w-3xl grid grid-cols-2 gap-3 mb-8 mt-1">
 			<!-- Botón Respuesta 1 -->
 			<x-boton 
@@ -91,16 +91,16 @@
 				size="lg" 
 			/>
 		</div>
-	</main>		<!-- Personajes en la acera/carretera (parte inferior central) -->
+	</main>		<!-- Personajes -->
 		<div class="absolute left-1 flex items-end gap-2 pointer-events-none z-30" style="bottom: 230px;">
-			<!-- Camello (izquierda) -->
+			
 			<div>
 				<img src="{{ asset('img/personajes/camello/camel.png') }}" 
 						alt="Camello" 
 						class="w-16 h-auto">
 			</div>
 
-			<!-- Player corriendo (derecha del camello) -->
+			
 			<div style="margin-bottom: 35px;">
 				<img src="{{ asset('img/personajes/player/player_corre.png') }}" 
 						alt="Player" 
