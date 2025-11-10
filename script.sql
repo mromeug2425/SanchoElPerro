@@ -40,7 +40,7 @@ GO
 CREATE TABLE sesiones (
     id BIGINT IDENTITY(1,1) NOT NULL,
     id_usuario BIGINT NOT NULL,
-    duracion TIME NOT NULL,
+    duracion TIME,
     monedas_gastadas BIGINT NOT NULL DEFAULT 0,
     createdAt DATETIME NOT NULL DEFAULT GETDATE(),
     CONSTRAINT sesiones_id_primary PRIMARY KEY (id),
