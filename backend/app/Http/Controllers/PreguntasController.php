@@ -2,64 +2,43 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Juegos;
 use App\Models\Preguntas;
-use Illuminate\Http\Request;
 
-class PreguntasController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+class PreguntasController extends Controller{
+    public function preguntasMostradas($id_juego = 1){
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $juego = Juegos::where('id', $id_juego)->first();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Preguntas $preguntas)
-    {
-        //
-    }
+        if (!$juego) {
+            return response()->json(['error' => 'Juego no encontrado'], 404);
+        }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Preguntas $preguntas)
-    {
-        //
-    }
+        $preguntas = Preguntas::where('id_juego', $id_juego)
+            ->inRandomOrder()
+            ->limit($juego->cantidad_preguntas)
+            ->get();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Preguntas $preguntas)
-    {
-        //
-    }
+        // Extraer los segundos del tiempo (formato: 1900-01-01 12:00:15:0000000)
+        $tiempoString = $juego->tiempo;
+        $tiempoSegundos = $juego->tiempo; // Valor por defecto
+        
+        if ($tiempoString) {
+            // Extraer solo los segundos de la cadena (formato: HH:MM:SS)
+            preg_match('/(\d{2}):(\d{2}):(\d{2})/', $tiempoString, $matches);
+            if (!empty($matches)) {
+                $horas = (int)$matches[1] - 12; // Restar 12 porque la BD usa 12:00:XX
+                $minutos = (int)$matches[2];
+                $segundos = (int)$matches[3];
+                $tiempoSegundos = ($horas * 3600) + ($minutos * 60) + $segundos;
+            }
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Preguntas $preguntas)
-    {
-        //
+        return response()->json([
+            'preguntas' => $preguntas,
+            'tiempo' => $tiempoSegundos
+        ]);
     }
+    
 }

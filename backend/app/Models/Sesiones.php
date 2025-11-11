@@ -7,10 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 
 class Sesiones extends Model
 {
-    //
     protected $table = 'sesiones';
     protected $primaryKey = 'id';
     public $timestamps = false;
+
+    protected $fillable = [
+        'id_usuario',
+        'duracion',
+        'monedas_gastadas',
+        'createdAt',
+    ];
+
+    protected $casts = [
+        'createdAt' => 'datetime',
+    ];
 
     public function sesionJuegos() {
         return $this->hasMany(Usuario::class, 'id_sesion');
@@ -20,5 +30,4 @@ class Sesiones extends Model
         return $this->belongsTo(Usuario::class, 'id_usuario');
     }
 }
-
 
