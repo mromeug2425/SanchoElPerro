@@ -3,11 +3,7 @@ let preguntaActual = 0;
 let tiempoLimite = 15; // Tiempo por defecto
 let tiempoRestante = 15;
 let intervaloTimer = null;
-
-// Cargar preguntas al iniciar la página
-document.addEventListener('DOMContentLoaded', function() {
-    cargarPreguntas(1);     // ID del juego 1 (cambiar cuando haya preguntas del juego 3)
-});
+let respuestaEsCorrecto = false; // Variable para registrar si la respuesta fue correcta
 
 async function cargarPreguntas(idJuego = 1) {
     try {
@@ -16,11 +12,17 @@ async function cargarPreguntas(idJuego = 1) {
             throw new Error('Error al cargar las preguntas');
         }
         const data = await response.json();
+        console.log('Datos recibidos:', data); // Log para debugging
         preguntas = data.preguntas || data; // Soporte para ambos formatos
         tiempoLimite = data.tiempo || 15; // Obtener el tiempo de la BD
         
+        console.log('Preguntas cargadas:', preguntas.length); // Log para debugging
+        console.log('Tiempo límite:', tiempoLimite); // Log para debugging
+        
         if (preguntas.length > 0) {
             mostrarPregunta(0);
+        } else {
+            console.log('No hay preguntas disponibles');
         }
         
         return preguntas;
@@ -99,7 +101,7 @@ function mostrarPregunta(index) {
     preguntaActual = index;
 
     // Actualizar el texto del diálogo con la pregunta y el contador
-    const dialogoTexto = document.querySelector('#dialogo-pregunta p');
+    const dialogoTexto = document.querySelector('#texto-pregunta');
     if (dialogoTexto) {
         const contador = `Pregunta ${index + 1}/${preguntas.length}`;
         dialogoTexto.textContent = `${contador} - ${pregunta.pregunta}`;
@@ -125,12 +127,17 @@ function verificarRespuesta(opcionSeleccionada) {
     
     const pregunta = preguntas[preguntaActual];
     
-    if (pregunta.answer === opcionSeleccionada) {
+    // Convertir answer a número para hacer la comparación correctamente
+    const respuestaCorrecta = parseInt(pregunta.answer);
+    
+    if (respuestaCorrecta === opcionSeleccionada) {
         console.log('¡Respuesta correcta! ✅');
         mostrarPopup('¡CORRECTO!', '¡Excelente! Has acertado la respuesta.', true);
+        respuestaEsCorrecto = true; // Variable global para uso en cerrarPopup
     } else {
         console.log('Respuesta incorrecta ❌');
         mostrarPopup('INCORRECTO', `La respuesta correcta era la opción ${pregunta.answer}.`, false);
+        respuestaEsCorrecto = false;
     }
 }
 
@@ -167,9 +174,28 @@ function cerrarPopup() {
     
     // Animar cierre
     popupContenido.style.transform = 'scale(0.95)';
-    setTimeout(() => {
+    setTimeout(async () => {
         popup.classList.add('hidden');
-        siguientePregunta();
+        
+        // Mover los personajes
+        await moverCamello(); // El camello siempre se mueve
+        
+        if (respuestaEsCorrecto) {
+            await moverJugador(); // El jugador solo se mueve si acierta
+        }
+        
+        // Verificar si hay ganador
+        const ganador = verificarGanador();
+        if (ganador === 'camello') {
+            deshabilitarBotones();
+            // Mostrar animación de camello moving en lugar de popup
+            await mostrarCamelloMoving();
+        } else if (ganador === 'player') {
+            mostrarPopup('¡VICTORIA!', '¡Has llegado a la meta! ¡Ganaste!', true);
+            deshabilitarBotones();
+        } else {
+            siguientePregunta();
+        }
     }, 200);
 }
 
