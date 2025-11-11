@@ -1,58 +1,31 @@
-// JUEGO 3 - Sistema de preguntas desde la base de datos
 let preguntas = [];
 let preguntaActual = 0;
 let tiempoLimite = 15; // Tiempo por defecto
 let tiempoRestante = 15;
 let intervaloTimer = null;
-let respuestaEsCorrecto = false;
 
-// Cargar preguntas del JUEGO 3 al iniciar la página
+// Cargar preguntas al iniciar la página
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🎮 Inicializando Juego 3...');
-    cargarPreguntas();
+    cargarPreguntas(1);     // ID del juego 1 (cambiar cuando haya preguntas del juego 3)
 });
 
-// Función para cargar las preguntas del juego 3 desde la base de datos
-async function cargarPreguntas() {
-    const idJuego = 3; // ID FIJO para el juego 3
-    
+async function cargarPreguntas(idJuego = 1) {
     try {
-        console.log(`📡 Cargando preguntas del juego ${idJuego}...`);
         const response = await fetch(`/preguntas/${idJuego}`);
-        
         if (!response.ok) {
-            throw new Error(`Error HTTP: ${response.status}`);
+            throw new Error('Error al cargar las preguntas');
         }
-        
         const data = await response.json();
-        console.log('📦 Datos recibidos de la BD:', data);
+        preguntas = data.preguntas || data; // Soporte para ambos formatos
+        tiempoLimite = data.tiempo || 15; // Obtener el tiempo de la BD
         
-        // Extraer preguntas y tiempo
-        preguntas = data.preguntas || data;
-        tiempoLimite = data.tiempo || 15;
-        
-        console.log(`✅ ${preguntas.length} preguntas cargadas del juego 3`);
-        console.log(`⏱️ Tiempo límite: ${tiempoLimite} segundos`);
-        
-        // Validar que hay preguntas
         if (preguntas.length > 0) {
             mostrarPregunta(0);
-        } else {
-            console.error('❌ No hay preguntas disponibles para el juego 3');
-            const dialogoTexto = document.querySelector('#texto-pregunta');
-            if (dialogoTexto) {
-                dialogoTexto.textContent = 'No hay preguntas disponibles para este juego.';
-            }
         }
         
         return preguntas;
     } catch (error) {
-        console.error('❌ Error al cargar preguntas:', error);
-        const dialogoTexto = document.querySelector('#texto-pregunta');
-        if (dialogoTexto) {
-            dialogoTexto.textContent = 'Error al cargar las preguntas. Por favor, recarga la página.';
-        }
-        deshabilitarBotones();
+        console.error('Error:', error);
     }
 }
 
@@ -118,26 +91,21 @@ function habilitarBotones() {
 
 function mostrarPregunta(index) {
     if (index >= preguntas.length) {  
-        console.log('⚠️ No hay más preguntas disponibles.');
+        console.log('No hay más preguntas disponibles.');
         return;
     }
 
     const pregunta = preguntas[index];
     preguntaActual = index;
 
-    console.log(`📋 Mostrando pregunta ${index + 1}/${preguntas.length}`);
-    console.log('Pregunta:', pregunta.pregunta);
-
     // Actualizar el texto del diálogo con la pregunta y el contador
-    const dialogoTexto = document.querySelector('#texto-pregunta');
+    const dialogoTexto = document.querySelector('#dialogo-pregunta p');
     if (dialogoTexto) {
         const contador = `Pregunta ${index + 1}/${preguntas.length}`;
         dialogoTexto.textContent = `${contador} - ${pregunta.pregunta}`;
-    } else {
-        console.error('❌ No se encontró el elemento #texto-pregunta');
     }
 
-    // Actualizar los botones con las opciones de la BD
+    // Actualizar los botones con las opciones
     document.getElementById('opcion1').textContent = pregunta.opcion_1;
     document.getElementById('opcion2').textContent = pregunta.opcion_2;
     document.getElementById('opcion3').textContent = pregunta.opcion_3;
@@ -149,8 +117,6 @@ function mostrarPregunta(index) {
 }
 
 function verificarRespuesta(opcionSeleccionada) {
-    console.log(`🎯 Verificando respuesta: Opción ${opcionSeleccionada}`);
-    
     // Detener el timer
     clearInterval(intervaloTimer);
     
@@ -159,20 +125,12 @@ function verificarRespuesta(opcionSeleccionada) {
     
     const pregunta = preguntas[preguntaActual];
     
-    // Convertir answer a número para comparación correcta
-    const respuestaCorrecta = parseInt(pregunta.answer);
-    
-    console.log('Respuesta correcta:', respuestaCorrecta);
-    console.log('Respuesta seleccionada:', opcionSeleccionada);
-    
-    if (respuestaCorrecta === opcionSeleccionada) {
-        console.log('✅ ¡Respuesta correcta!');
+    if (pregunta.answer === opcionSeleccionada) {
+        console.log('¡Respuesta correcta! ✅');
         mostrarPopup('¡CORRECTO!', '¡Excelente! Has acertado la respuesta.', true);
-        respuestaEsCorrecto = true;
     } else {
-        console.log('❌ Respuesta incorrecta');
-        mostrarPopup('INCORRECTO', `La respuesta correcta era la opción ${respuestaCorrecta}.`, false);
-        respuestaEsCorrecto = false;
+        console.log('Respuesta incorrecta ❌');
+        mostrarPopup('INCORRECTO', `La respuesta correcta era la opción ${pregunta.answer}.`, false);
     }
 }
 
@@ -217,20 +175,15 @@ function cerrarPopup() {
 
 function siguientePregunta() {
     if (preguntaActual < preguntas.length - 1) {
-        console.log(`➡️ Avanzando a la siguiente pregunta (${preguntaActual + 2}/${preguntas.length})`);
         mostrarPregunta(preguntaActual + 1);
     } else {
-        console.log('🎉 ¡Juego completado! Todas las preguntas respondidas.');
-        mostrarPopup('¡JUEGO COMPLETADO!', '¡Felicidades! Has respondido todas las preguntas del Juego 3.', true);
+        console.log('Fin del juego 🎉');
+        mostrarPopup('¡JUEGO COMPLETADO!', '¡Felicidades! Has respondido todas las preguntas.', true);
         // Modificar el botón para volver al inicio
         setTimeout(() => {
-            const botonContinuar = document.querySelector('#popup-resultado button');
-            if (botonContinuar) {
-                botonContinuar.onclick = function() {
-                    window.location.href = '/home';
-                };
-                botonContinuar.textContent = 'Volver al Inicio';
-            }
+            document.querySelector('#popup-resultado button').onclick = function() {
+                window.location.href = '/';
+            };
         }, 100);
     }
 }
