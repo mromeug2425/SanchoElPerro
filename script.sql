@@ -147,7 +147,7 @@ GO
 
 -- Insertar juegos de ejemplo
 INSERT INTO juegos (nombre, tiempo, cantidad_preguntas) VALUES
-('Geometría Cangur', '00:15:00', 50);
+('Geometría Cangur', '00:00:15', 5);
 GO
 
 -- Inserción de 50 preguntas de geometría estilo Cangur para SQL Server
