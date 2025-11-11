@@ -1,45 +1,65 @@
+// JUEGO 3 - Sistema de preguntas y respuestas
 let preguntas = [];
 let preguntaActual = 0;
 let tiempoLimite = 15; // Tiempo por defecto
 let tiempoRestante = 15;
 let intervaloTimer = null;
-let respuestaEsCorrecto = false; // Variable para registrar si la respuesta fue correcta
+let respuestaEsCorrecto = false;
 
-async function cargarPreguntas(idJuego = 1) {
+// Cargar preguntas del juego 3 desde la base de datos
+async function cargarPreguntas() {
+    const idJuego = 3; // ID fijo para el juego 3
+    
     try {
+        console.log('🎮 Cargando preguntas del juego 3...');
         const response = await fetch(`/preguntas/${idJuego}`);
+        
         if (!response.ok) {
-            throw new Error('Error al cargar las preguntas');
+            throw new Error(`Error HTTP: ${response.status}`);
         }
+        
         const data = await response.json();
-        console.log('Datos recibidos:', data); // Log para debugging
-        preguntas = data.preguntas || data; // Soporte para ambos formatos
-        tiempoLimite = data.tiempo || 15; // Obtener el tiempo de la BD
+        console.log('📦 Datos recibidos de la BD:', data);
         
-        console.log('Preguntas cargadas:', preguntas.length); // Log para debugging
-        console.log('Tiempo límite:', tiempoLimite); // Log para debugging
+        // Extraer preguntas y tiempo del objeto recibido
+        preguntas = data.preguntas || data;
+        tiempoLimite = data.tiempo || 15;
         
-        if (preguntas.length > 0) {
-            mostrarPregunta(0);
-        } else {
-            console.log('No hay preguntas disponibles');
+        console.log(`✅ ${preguntas.length} preguntas cargadas correctamente`);
+        console.log(`⏱️ Tiempo límite: ${tiempoLimite} segundos`);
+        
+        // Validar que haya preguntas
+        if (preguntas.length === 0) {
+            throw new Error('No hay preguntas disponibles para este juego');
         }
+        
+        // Mostrar la primera pregunta
+        mostrarPregunta(0);
         
         return preguntas;
+        
     } catch (error) {
-        console.error('Error:', error);
+        console.error('❌ Error al cargar preguntas:', error);
+        const dialogoTexto = document.querySelector('#texto-pregunta');
+        if (dialogoTexto) {
+            dialogoTexto.textContent = 'Error al cargar las preguntas. Por favor, recarga la página.';
+        }
+        deshabilitarBotones();
     }
 }
 
+// Iniciar el temporizador
 function iniciarTimer() {
     // Limpiar timer anterior si existe
     if (intervaloTimer) {
         clearInterval(intervaloTimer);
     }
     
-    // Resetear tiempo
+    // Resetear tiempo al límite definido en la BD
     tiempoRestante = tiempoLimite;
     actualizarDisplayTimer();
+    
+    console.log(`⏰ Timer iniciado: ${tiempoLimite} segundos`);
     
     // Iniciar contador regresivo
     intervaloTimer = setInterval(() => {
@@ -48,20 +68,24 @@ function iniciarTimer() {
         
         // Cambiar color cuando queda poco tiempo
         const timerElement = document.getElementById('tiempo-restante');
-        if (tiempoRestante <= 5) {
-            timerElement.style.color = '#ef4444'; // Rojo
-        } else {
-            timerElement.style.color = '#966E31'; // Color original
+        if (timerElement) {
+            if (tiempoRestante <= 5) {
+                timerElement.style.color = '#ef4444'; // Rojo
+            } else {
+                timerElement.style.color = '#966E31'; // Color original
+            }
         }
         
         // Si se acaba el tiempo
         if (tiempoRestante <= 0) {
             clearInterval(intervaloTimer);
+            console.log('⏱️ ¡Tiempo agotado!');
             tiempoAgotado();
         }
     }, 1000);
 }
 
+// Actualizar el display del temporizador
 function actualizarDisplayTimer() {
     const timerElement = document.getElementById('tiempo-restante');
     if (timerElement) {
@@ -69,74 +93,109 @@ function actualizarDisplayTimer() {
     }
 }
 
+// Manejar cuando se agota el tiempo
 function tiempoAgotado() {
-    // Deshabilitar botones
     deshabilitarBotones();
-    
-    // Mostrar popup de tiempo agotado
     mostrarPopup('¡TIEMPO AGOTADO!', 'Se acabó el tiempo para responder esta pregunta.', false);
 }
 
+// Deshabilitar todos los botones de opciones
 function deshabilitarBotones() {
-    document.getElementById('opcion1').disabled = true;
-    document.getElementById('opcion2').disabled = true;
-    document.getElementById('opcion3').disabled = true;
-    document.getElementById('opcion4').disabled = true;
+    const botones = ['opcion1', 'opcion2', 'opcion3', 'opcion4'];
+    botones.forEach(id => {
+        const boton = document.getElementById(id);
+        if (boton) {
+            boton.disabled = true;
+            boton.style.cursor = 'not-allowed';
+            boton.style.opacity = '0.5';
+        }
+    });
 }
 
+// Habilitar todos los botones de opciones
 function habilitarBotones() {
-    document.getElementById('opcion1').disabled = false;
-    document.getElementById('opcion2').disabled = false;
-    document.getElementById('opcion3').disabled = false;
-    document.getElementById('opcion4').disabled = false;
+    const botones = ['opcion1', 'opcion2', 'opcion3', 'opcion4'];
+    botones.forEach(id => {
+        const boton = document.getElementById(id);
+        if (boton) {
+            boton.disabled = false;
+            boton.style.cursor = 'pointer';
+            boton.style.opacity = '1';
+        }
+    });
 }
 
+// Mostrar una pregunta específica
 function mostrarPregunta(index) {
     if (index >= preguntas.length) {  
-        console.log('No hay más preguntas disponibles.');
+        console.log('⚠️ No hay más preguntas disponibles.');
         return;
     }
 
     const pregunta = preguntas[index];
     preguntaActual = index;
 
+    console.log(`📋 Mostrando pregunta ${index + 1}/${preguntas.length}`);
+    console.log('Pregunta:', pregunta.pregunta);
+
     // Actualizar el texto del diálogo con la pregunta y el contador
     const dialogoTexto = document.querySelector('#texto-pregunta');
     if (dialogoTexto) {
         const contador = `Pregunta ${index + 1}/${preguntas.length}`;
         dialogoTexto.textContent = `${contador} - ${pregunta.pregunta}`;
+    } else {
+        console.error('❌ No se encontró el elemento #texto-pregunta');
     }
 
-    // Actualizar los botones con las opciones
-    document.getElementById('opcion1').textContent = pregunta.opcion_1;
-    document.getElementById('opcion2').textContent = pregunta.opcion_2;
-    document.getElementById('opcion3').textContent = pregunta.opcion_3;
-    document.getElementById('opcion4').textContent = pregunta.opcion_4;
+    // Actualizar los botones con las opciones desde la BD
+    const opciones = [
+        { id: 'opcion1', texto: pregunta.opcion_1 },
+        { id: 'opcion2', texto: pregunta.opcion_2 },
+        { id: 'opcion3', texto: pregunta.opcion_3 },
+        { id: 'opcion4', texto: pregunta.opcion_4 }
+    ];
+
+    opciones.forEach(opcion => {
+        const boton = document.getElementById(opcion.id);
+        if (boton) {
+            boton.textContent = opcion.texto;
+        } else {
+            console.error(`❌ No se encontró el botón #${opcion.id}`);
+        }
+    });
     
     // Habilitar botones y iniciar timer
     habilitarBotones();
     iniciarTimer();
 }
 
+// Verificar la respuesta seleccionada
 function verificarRespuesta(opcionSeleccionada) {
+    console.log(`🎯 Verificando respuesta: Opción ${opcionSeleccionada}`);
+    
     // Detener el timer
-    clearInterval(intervaloTimer);
+    if (intervaloTimer) {
+        clearInterval(intervaloTimer);
+    }
     
     // Deshabilitar botones para evitar múltiples clics
     deshabilitarBotones();
     
     const pregunta = preguntas[preguntaActual];
     
-    // Convertir answer a número para hacer la comparación correctamente
+    // Convertir answer a número para comparación correcta
     const respuestaCorrecta = parseInt(pregunta.answer);
     
+    console.log('Respuesta correcta:', respuestaCorrecta);
+    console.log('Respuesta seleccionada:', opcionSeleccionada);
+    
     if (respuestaCorrecta === opcionSeleccionada) {
-        console.log('¡Respuesta correcta! ✅');
+        console.log('✅ ¡Respuesta correcta!');
         mostrarPopup('¡CORRECTO!', '¡Excelente! Has acertado la respuesta.', true);
-        respuestaEsCorrecto = true; // Variable global para uso en cerrarPopup
+        respuestaEsCorrecto = true;
     } else {
-        console.log('Respuesta incorrecta ❌');
-        mostrarPopup('INCORRECTO', `La respuesta correcta era la opción ${pregunta.answer}.`, false);
+        console.log('❌ Respuesta incorrecta');
+        mostrarPopup('INCORRECTO', `La respuesta correcta era la opción ${respuestaCorrecta}.`, false);
         respuestaEsCorrecto = false;
     }
 }

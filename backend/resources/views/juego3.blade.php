@@ -20,11 +20,13 @@
 		<div class="absolute top-20 left-1/2 transform -translate-x-1/2 z-10 max-w-2xl w-full px-4">
 			<div class="flex items-center gap-4">
 				<div id="dialogo-pregunta" class="flex-1">
-					<x-dialogo 
-						bg_color="white" 
-						border_color="brown" 
-						text="" 
-					/>
+					<div class="bg-white/80 border-2 border-brown p-4 rounded-xl shadow-md w-full h-full">
+						<div class="flex items-start">
+							<p id="texto-pregunta" class="text-md font-medium font-jersey text-brown">
+								Cargando pregunta...
+							</p>
+						</div>
+					</div>
 				</div>
 				<div id="timer" class="bg-white border-2 border-brown rounded-xl shadow-md px-6 py-4 text-center">
 					<div class="text-sm font-jersey text-gray-600">TIEMPO</div>
@@ -62,5 +64,11 @@
 	</div>
 
 	<script src="{{ asset('js/preguntas.js') }}"></script>
+	<script>
+		// Cargar las preguntas del juego 3 cuando la página se carga
+		document.addEventListener('DOMContentLoaded', function() {
+			cargarPreguntas(3); // ID del juego 3
+		});
+	</script>
 @endsection
 
