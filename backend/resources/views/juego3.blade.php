@@ -63,12 +63,6 @@
 		</div>
 	</div>
 
-	<script src="{{ asset('js/preguntas.js') }}"></script>
-	<script>
-		// Cargar las preguntas del juego 3 cuando la página se carga
-		document.addEventListener('DOMContentLoaded', function() {
-			cargarPreguntas(3); // ID del juego 3
-		});
-	</script>
+	<script src="{{ asset('js/juego3.js') }}"></script>
 @endsection
 
