@@ -318,3 +318,13 @@ INSERT INTO preguntas (id_juego, pregunta, opcion_1, opcion_2, opcion_3, opcion_
 (1, '¿Cuánto es 60 ÷ 5?', '10', '12', '15', '20', 'C', NULL);
 GO
 
+-- Insertar mejoras iniciales
+INSERT INTO [SanchoElPerro].[dbo].[mejoras] 
+    ([nombre], [activo], [nivel_1], [nivel_2], [nivel_3], [nivel_4])
+VALUES
+    ('Mejora Base', 1, 'casa.png', 'duplex.png', 'estatua_dorada.png', 'helicoptero.png');
+
+    -- alter table de nivel 5
+
+    ALTER TABLE [SanchoElPerro].[dbo].[mejoras]
+ADD [nivel_5] NVARCHAR(255) NULL;

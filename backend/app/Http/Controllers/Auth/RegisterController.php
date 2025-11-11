@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Usuario;
 use App\Models\Sesiones;
+use App\Models\UsuariosMejoras;
 use Carbon\Carbon;
 
 class RegisterController extends Controller
@@ -74,6 +75,14 @@ class RegisterController extends Controller
             'current_sesion_id' => $sesion->id,
             'sesion_created_at' => $currentDateTime,
         ]);
+
+        $mejora = new UsuariosMejoras();
+        $mejora->id_usuario = $user->id;
+        $mejora->id_mejora = 1; 
+        $mejora->nivel = 0;
+        $mejora->save();
+
+        
 
         return view('home');
     }
