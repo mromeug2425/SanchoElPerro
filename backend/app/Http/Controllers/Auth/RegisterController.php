@@ -53,7 +53,7 @@ class RegisterController extends Controller
         $user->monedas_gastadas = 0;
         $user->save();
 
-        // Auto-login
+        // Auto-login -
         Auth::login($user);
         $request->session()->regenerate();
 
