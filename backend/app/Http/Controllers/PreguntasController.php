@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Juegos;
 use App\Models\Preguntas;
+use Illuminate\Support\Facades\Log;
 
 
 class PreguntasController extends Controller{
@@ -25,14 +26,25 @@ class PreguntasController extends Controller{
         $tiempoSegundos = 15; // Valor por defecto
         
         if ($tiempoString) {
-            // Extraer HH:MM:SS de la cadena
-            preg_match('/(\d{2}):(\d{2}):(\d{2})/', $tiempoString, $matches);
-            if (!empty($matches)) {
-                $horas = (int)$matches[1];
-                $minutos = (int)$matches[2];
-                $segundos = (int)$matches[3];
-                $tiempoSegundos = ($horas * 3600) + ($minutos * 60) + $segundos;
+            // Log para debugging
+            Log::info('Tiempo original de la BD: ' . $tiempoString);
+            
+            // Convertir el objeto Carbon o string a segundos
+            if (is_object($tiempoString)) {
+                // Si es un objeto Carbon/DateTime
+                $tiempoSegundos = ($tiempoString->hour * 3600) + ($tiempoString->minute * 60) + $tiempoString->second;
+            } else {
+                // Si es string, extraer HH:MM:SS
+                preg_match('/(\d{2}):(\d{2}):(\d{2})/', $tiempoString, $matches);
+                if (!empty($matches)) {
+                    $horas = (int)$matches[1];
+                    $minutos = (int)$matches[2];
+                    $segundos = (int)$matches[3];
+                    $tiempoSegundos = ($horas * 3600) + ($minutos * 60) + $segundos;
+                }
             }
+            
+            Log::info('Tiempo en segundos: ' . $tiempoSegundos);
         }
 
         return response()->json([
