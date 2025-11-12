@@ -1,0 +1,85 @@
+name: Deploy Backend to FTP
+
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - "backend/**"
+    pull_request:
+        branches:
+            - main
+        paths:
+            - "backend/**"
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        env:
+            PROJECT_PATH: /htdocs/
+
+        steps:
+            - name: Checkout repositorio
+              uses: actions/checkout@v3
+
+            - name: Instalar PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: "8.2"
+                  extensions: mbstring, bcmath, pdo, openssl, tokenizer, xml
+                  coverage: none
+
+            - name: Instalar dependencias para SQL Server (ODBC + extensiones PHP)
+              run: |
+                  sudo apt-get update
+                  sudo ACCEPT_EULA=Y apt-get install -y \
+                      gnupg2 \
+                      curl \
+                      unixodbc-dev
+
+                  # Agregar repositorio Microsoft
+                  curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+                  curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+
+                  sudo apt-get update
+                  sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
+
+                  # Instalar sqlsrv si no está instalado
+                  if ! php -m | grep -q sqlsrv; then
+                      sudo pecl install sqlsrv
+                  else
+                      echo "sqlsrv ya está instalado, no se reinstala."
+                  fi
+
+                  # Instalar pdo_sqlsrv si no está instalado
+                  if ! php -m | grep -q pdo_sqlsrv; then
+                      sudo pecl install pdo_sqlsrv
+                  else
+                      echo "pdo_sqlsrv ya está instalado, no se reinstala."
+                  fi
+
+                  # Habilitar extensiones en php.ini
+                  echo "extension=sqlsrv.so" | sudo tee -a /etc/php/8.2/cli/php.ini
+                  echo "extension=pdo_sqlsrv.so" | sudo tee -a /etc/php/8.2/cli/php.ini
+
+            - name: Instalar Composer
+              run: composer install --no-dev --optimize-autoloader
+              working-directory: ./backend
+
+            - name: Subir backend por FTP (sin vendor/, con limpieza)
+              uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+              with:
+                  server: ${{ secrets.FTP_HOST }}
+                  username: ${{ secrets.FTP_USER }}
+                  password: ${{ secrets.FTP_PASS }}
+                  local-dir: ./backend/
+                  server-dir: ${{ env.PROJECT_PATH }}
+                  exclude: |
+                      .git*
+                      node_modules/
+                      vendor/
+                      vendor/**
+                      tests/
+                      .env
+                      .env.*
