@@ -110,10 +110,14 @@ CREATE TABLE mejoras (
     id BIGINT IDENTITY(1,1) NOT NULL,
     nombre NVARCHAR(255) NOT NULL,
     activo BIT NOT NULL DEFAULT 1,
-    nivel_1 NVARCHAR(MAX) NOT NULL,
-    nivel_2 NVARCHAR(MAX) NOT NULL,
-    nivel_3 NVARCHAR(MAX) NOT NULL,
-    nivel_4 NVARCHAR(MAX) NOT NULL,
+    img NVARCHAR(255) NOT NULL,
+    precio_nv1 BIGINT NOT NULL DEFAULT 0,
+    img_n2 VARCHAR(255) NULL,
+    precio_nv2 BIGINT NOT NULL DEFAULT 0,
+    img_n3 VARCHAR(255) NULL,
+    precio_nv3 BIGINT NOT NULL DEFAULT 0,
+    img_n4 VARCHAR(255) NULL,
+    precio_nv4 BIGINT NOT NULL DEFAULT 0,
     CONSTRAINT mejoras_id_primary PRIMARY KEY (id)
 );
 GO
@@ -319,12 +323,12 @@ INSERT INTO preguntas (id_juego, pregunta, opcion_1, opcion_2, opcion_3, opcion_
 GO
 
 -- Insertar mejoras iniciales
-INSERT INTO [SanchoElPerro].[dbo].[mejoras] 
-    ([nombre], [activo], [nivel_1], [nivel_2], [nivel_3], [nivel_4])
-VALUES
-    ('Mejora Base', 1, 'casa.png', 'duplex.png', 'estatua_dorada.png', 'helicoptero.png');
+INSERT INTO mejoras ( nombre, activo, img, precio_nv1, precio_nv2, precio_nv3, precio_nv4) VALUES
+( 'CASA', 1, 'img/casa.png', 100, 200, 300, 400),
+( 'DUPLEX', 1, 'img/duplex.png', 150, 250, 350, 450),
+('ESTATUA DORADA', 1, 'img/estatua_dorada.png', 200, 300, 400, 500),
+( 'HELICOPTERO', 1, 'img/helicoptero.png', 250, 350, 450, 550),
+( 'PERRO', 1, 'img/perro.png', 300, 400, 500, 600);
 
     -- alter table de nivel 5
 
-    ALTER TABLE [SanchoElPerro].[dbo].[mejoras]
-ADD [nivel_5] NVARCHAR(255) NULL;
