@@ -6,11 +6,13 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\NavigationController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\MejorasController;
+use App\Http\Controllers\UsuarioController;
 
 Route::get('/', [NavigationController::class, 'home'])->name('home');
 
 Route::get('/tienda/{id_usuario}', [NavigationController::class, 'tienda'])->name('tienda');
 Route::post('/tienda/comprar', [NavigationController::class, 'comprarMejora'])->name('tienda.comprar');
+Route::get('/usuario/{id_usuario}/mejoras', [UsuarioController::class, 'mostrarMejoras'])->name('usuario.mejoras');
 
 Route::get('/niveles', [NavigationController::class, 'niveles'])->name('niveles');
 

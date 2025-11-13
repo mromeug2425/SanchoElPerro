@@ -16,11 +16,13 @@ class UsuariosMejoras extends Model
         'nivel'
     ];
 
-    public function mejoras() {
-        return $this->hasOne(Mejoras::class, 'id_usuarios');
+    // Relación: una mejora de usuario pertenece a una mejora
+    public function mejora() {
+        return $this->belongsTo(Mejoras::class, 'id_mejora');
     }
 
-    public function usuarios() {
-        return $this->belongsTo(Usuario::class, 'id');
+    // Relación: una mejora de usuario pertenece a un usuario
+    public function usuario() {
+        return $this->belongsTo(Usuario::class, 'id_usuario');
     }
 }

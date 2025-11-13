@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Mejoras;
 use App\Models\Usuario;
+use Illuminate\Http\Request;
 
 
 class NavigationController extends Controller
@@ -57,6 +58,16 @@ class NavigationController extends Controller
     public function juego4()
     {
         return view('juego4');
+    }
+
+    public function comprarMejora(Request $request)
+    {
+        $id_usuario = $request->input('id_usuario');
+        $id_mejora = $request->input('id_mejora');
+
+        
+
+        return redirect()->route('tienda', ['id_usuario' => $id_usuario]);
     }
 
 }
