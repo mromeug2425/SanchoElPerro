@@ -13,14 +13,14 @@ class NavigationController extends Controller
         return view('home');
     }
 
-    public function tienda()
+    public function tienda($id_usuario)
     {
         $mejoras = Mejoras::where('activo', 1)
                         ->orderBy('id')
                         ->get();
         
         // Obtener el usuario (asumiendo que hay un solo usuario por ahora)
-        $usuario = Usuario::first();
+        $usuario = Usuario::find($id_usuario);
         $monedas = $usuario ? $usuario->monedas : 0;
 
         return view('tienda', [

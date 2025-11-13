@@ -24,7 +24,7 @@
 			<!-- Botones de Tienda y Juegos a la derecha (cuando está autenticado) -->
 			<div class="absolute right-8 bottom-32 z-20 flex flex-col gap-6">
 				<!-- Botón TIENDA -->
-				<a href="{{ route('tienda') }}" 
+				<a href="{{ route('tienda', ['id_usuario' => Auth::id()]) }}" 
 				class="bg-gradient-to-b from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white font-black py-6 px-16 rounded-2xl shadow-2xl hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)] uppercase tracking-wider text-2xl border-4 border-black transition-all duration-200 hover:scale-110 hover:-translate-y-1 active:scale-105 [text-shadow:_2px_2px_0_rgb(0_0_0)]">
 					Tienda
 				</a>
