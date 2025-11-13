@@ -1,3 +1,41 @@
+class SimpleMathGame {
+    constructor() {
+        this.solution = 0;
+    }
+
+    generateProblem() {
+        // Elegir dos números aleatorios entre 1 y 10
+        const num1 = Math.floor(Math.random() * 10) + 1;
+        const num2 = Math.floor(Math.random() * 10) + 1;
+
+        // Resultado del lado izquierdo
+        const leftResult = num1 + num2;
+
+        // Escoger num3 entre 1 y leftResult-1 para que ? sea positivo
+        const num3 = Math.floor(Math.random() * (leftResult - 1)) + 1;
+        const missing = leftResult - num3;
+
+        this.solution = missing;
+
+        return {
+            numbers: [num1, num2, num3],
+            solution: missing
+        };
+    }
+
+    verifySolution(answer) {
+        return answer === this.solution;
+    }
+}
+
+let game;
+let currentProblem;
+
+document.addEventListener('DOMContentLoaded', function() {
+    game = new SimpleMathGame();
+    startNewGame();
+});
+
 function startNewGame() {
     currentProblem = game.generateProblem();
 
@@ -17,11 +55,10 @@ function startNewGame() {
     const buttons = document.querySelectorAll('button[onclick^="comprobar"]');
     buttons.forEach((btn, i) => {
         btn.textContent = options[i];
-        btn.dataset.value = options[i]; // guardamos valor real
+        btn.dataset.value = options[i];
     });
 }
 
-// Función para crear 3 números aleatorios + la solución y mezclarlos
 function generateOptions(correct) {
     let opts = [correct];
     while (opts.length < 4) {
@@ -31,7 +68,6 @@ function generateOptions(correct) {
     return opts.sort(() => Math.random() - 0.5);
 }
 
-// Comprobar respuesta
 function comprobar(opcion) {
     const btn = document.querySelector(`button[onclick="comprobar(${opcion})"]`);
     const selected = parseInt(btn.dataset.value);

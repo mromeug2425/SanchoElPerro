@@ -22,8 +22,8 @@
         <div class="absolute top-[27%] left-[27%] transform -translate-x-1/2 -translate-y-1/2 
              w-[262px] h-[190px] flex flex-col items-center justify-center 
              p-12 rounded-xl shadow-xl bg-white bg-opacity-90 border-4 border-black">
-            <p class="text-3xl font-extrabold tracking-wider text-gray-800">3 + 4</p>
-            <p class="text-3xl font-extrabold tracking-wider mt-2 text-gray-800">5 + ?</p>
+            <p class="text-3xl font-extrabold tracking-wider text-gray-800">0 + 0</p>
+            <p class="text-3xl font-extrabold tracking-wider mt-2 text-gray-800">0 + ?</p>
         </div>
 
         <!-- Indicaciones -->
@@ -54,7 +54,6 @@
         <div class="absolute top-[50%] left-1/2 transform -translate-x-1/2 w-full text-center z-20">
             <span id="mensaje" class="text-3xl font-extrabold text-white bg-gray-900 bg-opacity-70 p-2 rounded-lg shadow-xl"></span>
         </div>
-
     </main>
 </div>
 
@@ -62,27 +61,25 @@
 <script>
 class SimpleMathGame {
     constructor() {
-        this.operations = ['+','-'];
-        this.target = 0;
         this.solution = 0;
     }
 
     generateProblem() {
+        // Elegir dos números aleatorios entre 1 y 10
         const num1 = Math.floor(Math.random() * 10) + 1;
         const num2 = Math.floor(Math.random() * 10) + 1;
-        const num3 = Math.floor(Math.random() * 10) + 1;
 
-        const opLeft = this.operations[Math.floor(Math.random() * this.operations.length)];
+        // Resultado del lado izquierdo
+        const leftResult = num1 + num2;
 
-        let leftResult = opLeft === '+' ? num1 + num2 : num1 - num2;
+        // Escoger num3 entre 1 y leftResult-1 para que ? sea positivo
+        const num3 = Math.floor(Math.random() * (leftResult - 1)) + 1;
         const missing = leftResult - num3;
 
-        this.target = leftResult;
         this.solution = missing;
 
         return {
-            left: [num1, num2],
-            right: [num3, '?'],
+            numbers: [num1, num2, num3],
             solution: missing
         };
     }
@@ -106,8 +103,8 @@ function startNewGame() {
     // Actualizar pizarra izquierda
     const leftP = document.querySelector('div > p:first-child');
     const rightP = document.querySelector('div > p:nth-child(2)');
-    leftP.textContent = `${currentProblem.left[0]} + ${currentProblem.left[1]}`;
-    rightP.textContent = `${currentProblem.right[0]} + ?`;
+    leftP.textContent = `${currentProblem.numbers[0]} + ${currentProblem.numbers[1]}`;
+    rightP.textContent = `${currentProblem.numbers[2]} + ?`;
 
     // Limpiar mensaje
     const msg = document.getElementById('mensaje');
@@ -119,11 +116,10 @@ function startNewGame() {
     const buttons = document.querySelectorAll('button[onclick^="comprobar"]');
     buttons.forEach((btn, i) => {
         btn.textContent = options[i];
-        btn.dataset.value = options[i]; // valor real del botón
+        btn.dataset.value = options[i];
     });
 }
 
-// Crear 3 números aleatorios + la solución y mezclarlos
 function generateOptions(correct) {
     let opts = [correct];
     while (opts.length < 4) {
@@ -133,7 +129,6 @@ function generateOptions(correct) {
     return opts.sort(() => Math.random() - 0.5);
 }
 
-// Comprobar respuesta
 function comprobar(opcion) {
     const btn = document.querySelector(`button[onclick="comprobar(${opcion})"]`);
     const selected = parseInt(btn.dataset.value);
