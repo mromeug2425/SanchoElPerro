@@ -23,6 +23,11 @@
 			};
 		</script>
 
+		<script>
+			// API Path configuration for production vs development
+			window.API_PATH = '{{ env("API_PATH", "") }}';
+		</script>
+
 		@stack('styles')
 	</head>
 	<body class="antialiased bg-gray-900">
