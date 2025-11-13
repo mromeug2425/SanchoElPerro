@@ -26,8 +26,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->midd
 
 // Registro
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('/register', [RegisterController::class, 'register']);  
 Route::post('/register', [RegisterController::class, 'register']);
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
+// Preguntas
 Route::get('preguntas/{id_juego?}', [PreguntasController::class, 'preguntasMostradas']);

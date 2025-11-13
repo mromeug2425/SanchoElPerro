@@ -49,6 +49,11 @@ class Usuario extends Authenticatable
         return 'id';
     }
 
+    public function getAuthPassword()
+    {
+        return $this->password;
+    }
+
     public function sesiones() {
         return $this->hasMany(Sesiones::class, 'id');
     }
