@@ -4,8 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Mejoras;
 use App\Models\Usuario;
-use App\Models\UsuariosMejoras;
-use Illuminate\Http\Request;
+
 
 class NavigationController extends Controller
 {
