@@ -5,6 +5,7 @@ use App\Http\Controllers\PreguntasController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\NavigationController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\MejorasController;
 
 Route::get('/', [NavigationController::class, 'home'])->name('home');
 
