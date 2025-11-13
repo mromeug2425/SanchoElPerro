@@ -132,7 +132,6 @@
 	</div>
 
 	<script src="{{ asset('js/juego2.js') }}"></script>
-	<script src="{{ asset('js/preguntas.js') }}"></script>
 	<script>
 		// Inicializar el juego 2 al cargar la página
 		document.addEventListener('DOMContentLoaded', function() {
