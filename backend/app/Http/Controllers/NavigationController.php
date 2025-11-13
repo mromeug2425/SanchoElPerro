@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Mejoras;
 use Illuminate\Http\Request;
 
 class NavigationController extends Controller
@@ -13,7 +14,12 @@ class NavigationController extends Controller
 
     public function tienda()
     {
-        return view('tienda');
+
+        $mejoras = Mejoras::where('activo', 1)
+                        ->orderBy('id')
+                        ->get();
+
+        return view('tienda', ['mejoras' => $mejoras]);
     }
 
     public function niveles()
