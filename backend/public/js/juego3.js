@@ -12,10 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
 async function cargarPreguntas(idJuego = 1) {
     try {
         const baseUrl = window.BASE_URL || window.location.origin;
-        const apiPath = window.API_PATH || "";
-        const response = await fetch(
-            `${baseUrl}${apiPath}/preguntas/${idJuego}`
-        );
+        const response = await fetch(`${baseUrl}/preguntas/${idJuego}`);
         if (!response.ok) {
             throw new Error("Error al cargar las preguntas");
         }
