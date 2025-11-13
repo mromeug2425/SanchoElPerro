@@ -7,5 +7,5 @@ use Illuminate\Http\Request;
 
 class MejorasController extends Controller
 {
-    public function tienda(){
+
 }
