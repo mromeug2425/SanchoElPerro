@@ -1,0 +1,154 @@
+/* Estilos para la página de Niveles */
+
+@keyframes fadeInScale {
+	from {
+		opacity: 0;
+		transform: scale(0.9);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+.animate-fade-in-scale {
+	animation: fadeInScale 0.6s ease-out 0.3s forwards;
+	opacity: 0;
+}
+
+/* Contenedor del tablón */
+.tablon-container {
+	position: relative;
+	max-width: 750px;
+	width: 90%;
+}
+
+/* Tarjetas de nivel */
+.nivel-card {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	transition: transform 0.3s ease;
+	max-width: 200px;
+	margin: 0 auto;
+}
+
+.nivel-card:hover {
+	transform: scale(1.05);
+	z-index: 10;
+}
+
+/* Wrapper que contiene chincheta + imagen */
+.nivel-wrapper {
+	position: relative;
+	width: 100%;
+	display: inline-block;
+}
+
+/* Link que envuelve el wrapper */
+.nivel-link {
+	display: block;
+	text-decoration: none;
+}
+
+/* Imágenes de nivel */
+.nivel-image {
+	width: 100%;
+	height: auto;
+	aspect-ratio: 4/3;
+	object-fit: cover;
+	border-radius: 10px;
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+	transition: all 0.3s ease;
+	cursor: pointer;
+	border: 3px solid rgba(62, 215, 226, 0.712);
+	display: block;
+}
+
+.nivel-link:hover .nivel-image {
+	box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+	transform: translateY(-4px);
+}
+
+/* Chinchetas */
+.chincheta {
+	position: absolute;
+	width: 40px;
+	height: auto;
+	z-index: 20;
+	pointer-events: none;
+	filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+/* Posiciones específicas para cada chincheta (como en la imagen original) */
+.chincheta-1 {
+	top: -8px;
+	left: 50%;
+	transform: translateX(-50%) rotate(-12deg);
+}
+
+.chincheta-2 {
+	top: -8px;
+	left: 50%;
+	transform: translateX(-50%) rotate(18deg);
+}
+
+.chincheta-3 {
+	top: -8px;
+	left: 50%;
+	transform: translateX(-50%) rotate(-8deg);
+}
+
+.chincheta-4 {
+	top: -8px;
+	left: 50%;
+	transform: translateX(-50%) rotate(15deg);
+}
+
+/* Animaciones individuales para cada tarjeta */
+.nivel-card:nth-child(1) {
+	animation: fadeInScale 0.5s ease-out 0.4s forwards;
+	opacity: 0;
+	margin-top: 110px;
+}
+
+.nivel-card:nth-child(2) {
+	animation: fadeInScale 0.5s ease-out 0.5s forwards;
+	opacity: 0;
+	margin-top: 110px;
+}
+
+.nivel-card:nth-child(3) {
+	animation: fadeInScale 0.5s ease-out 0.6s forwards;
+	opacity: 0;
+	margin-top: -30px;
+}
+
+.nivel-card:nth-child(4) {
+	animation: fadeInScale 0.5s ease-out 0.7s forwards;
+	opacity: 0;
+	margin-top: -30px;
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 768px) {
+	.tablon-container {
+		max-width: 100%;
+		width: 95%;
+	}
+
+	.nivel-card {
+		max-width: 150px;
+	}
+
+	.chincheta {
+		width: 25px;
+	}
+
+	.nivel-image {
+		border-radius: 8px;
+		border-width: 2px;
+	}
+}

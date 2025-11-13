@@ -11,7 +11,7 @@
 		<!-- Botón Atrás -->
 		<div class="absolute top-4 left-4 z-20">
 			<a href="{{ route('home') }}" 
-			   class="bg-gray-800 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-full shadow-lg uppercase tracking-wider text-sm transition-all duration-200 hover:scale-105">
+			class="bg-gray-800 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-full shadow-lg uppercase tracking-wider text-sm transition-all duration-200 hover:scale-105">
 				Atrás
 			</a>
 		</div>
@@ -41,12 +41,12 @@
 						@csrf
 						
 						<div class="animate-slide-up" style="animation-delay: 0.2s;">
-							<label for="email" class="block text-black font-bold mb-1 uppercase text-xs tracking-wide">Nombre de Usuario</label>
+							<label for="username" class="block text-black font-bold mb-1 uppercase text-xs tracking-wide">Nombre de Usuario</label>
 							<input 
-								id="email" 
-								name="email" 
-								type="email" 
-								value="{{ old('email') }}" 
+								id="username" 
+								name="username" 
+								type="text" 
+								value="{{ old('username') }}" 
 								required
 								autofocus
 								class="w-full px-3 py-2 rounded-lg bg-white border-2 border-gray-300 focus:border-black focus:outline-none text-gray-800 text-sm transition-transform duration-200 focus:scale-[1.02]">
