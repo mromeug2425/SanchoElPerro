@@ -10,6 +10,7 @@ use App\Http\Controllers\MejorasController;
 Route::get('/', [NavigationController::class, 'home'])->name('home');
 
 Route::get('/tienda', [NavigationController::class, 'tienda'])->name('tienda');
+Route::post('/tienda/comprar', [NavigationController::class, 'comprarMejora'])->name('tienda.comprar');
 
 Route::get('/niveles', [NavigationController::class, 'niveles'])->name('niveles');
 

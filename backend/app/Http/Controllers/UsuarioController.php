@@ -7,59 +7,35 @@ use Illuminate\Http\Request;
 
 class UsuarioController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+
+    public function ganarMonedas(){
+        $usuario = Usuario::first(); // Suponiendo que hay un solo usuario
+
+        if ($usuario) {
+            $usuario->monedas += 100; // Añadir 100 monedas
+            $usuario->save();
+
+            return response()->json(['message' => 'Monedas añadidas correctamente', 'monedas' => $usuario->monedas]);
+        } else {
+            return response()->json(['error' => 'Usuario no encontrado'], 404);
+        }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+    public function gastarMonedas(){
+        $usuario = Usuario::first(); // Suponiendo que hay un solo usuario
+
+        if ($usuario) {
+            if ($usuario->monedas >= 50) {
+                $usuario->monedas -= 50; // Restar 50 monedas
+                $usuario->save();
+
+                return response()->json(['message' => 'Monedas gastadas correctamente', 'monedas' => $usuario->monedas]);
+            } else {
+                return response()->json(['error' => 'No tienes suficientes monedas'], 400);
+            }
+        } else {
+            return response()->json(['error' => 'Usuario no encontrado'], 404);
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Usuario $usuario)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Usuario $usuario)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Usuario $usuario)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Usuario $usuario)
-    {
-        //
-    }
 }
