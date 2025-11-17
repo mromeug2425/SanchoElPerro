@@ -68,6 +68,11 @@ function actualizarDisplayTimer() {
 }
 
 function tiempoAgotado() {
+    // ⭐ NUEVO: Detener time events
+    if (typeof detenerTimeEvents === 'function') {
+        detenerTimeEvents();
+    }
+    
     // Deshabilitar botones
     deshabilitarBotones();
     
@@ -114,11 +119,21 @@ function mostrarPregunta(index) {
     // Habilitar botones y iniciar timer
     habilitarBotones();
     iniciarTimer();
+    
+    // ⭐ NUEVO: Iniciar time events (formas geométricas)
+    if (typeof iniciarTimeEvents === 'function') {
+        iniciarTimeEvents();
+    }
 }
 
 function verificarRespuesta(opcionSeleccionada) {
     // Detener el timer
     clearInterval(intervaloTimer);
+    
+    // ⭐ NUEVO: Detener time events
+    if (typeof detenerTimeEvents === 'function') {
+        detenerTimeEvents();
+    }
     
     // Deshabilitar botones para evitar múltiples clics
     deshabilitarBotones();

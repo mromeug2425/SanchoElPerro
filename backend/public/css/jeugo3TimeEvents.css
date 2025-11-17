@@ -1,0 +1,15 @@
+@keyframes floatUp {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+}
+
+.time-event-forma:hover {
+    transform: scale(1.1) !important;
+    filter: brightness(1.2);
+}

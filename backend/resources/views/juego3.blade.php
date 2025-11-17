@@ -61,6 +61,7 @@
 		</div>
 	</div>
 
+	<script src="{{ asset('js/juego3TimeEvents.js') }}"></script>
 	<script src="{{ asset('js/preguntas.js') }}"></script>
 @endsection
 
