@@ -5,6 +5,7 @@ use App\Http\Controllers\PreguntasController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\NavigationController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\MejorasController;
 
 Route::get('/', [NavigationController::class, 'home'])->name('home');
 
@@ -25,8 +26,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->midd
 
 // Registro
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('/register', [RegisterController::class, 'register']);  
 Route::post('/register', [RegisterController::class, 'register']);
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
+// Preguntas
 Route::get('preguntas/{id_juego?}', [PreguntasController::class, 'preguntasMostradas']);

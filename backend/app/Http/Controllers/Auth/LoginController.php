@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\Sesiones;
+use App\Models\Usuario;
 use Carbon\Carbon;
 
 class LoginController extends Controller
@@ -36,72 +37,48 @@ class LoginController extends Controller
 			'password' => ['required'],
 		]);
 
-		$remember = $request->boolean('remember');
-
-		if (Auth::attempt(['nombre_usuario' => $credentials['username'], 'password' => $credentials['password']], $remember)) {
-			$request->session()->regenerate();
-
-			// Obtener el ID del usuario autenticado
-			$userId = Auth::user()->id;
-			
-			// Cerrar cualquier sesión anterior que esté abierta (duracion = null)
-			$openSessions = Sesiones::where('id_usuario', $userId)
+		$user = Usuario::where('nombre_usuario', $credentials['username'])->first();
+		
+		if ($user) {
+			$openSessions = Sesiones::where('id_usuario', $user->id)
 				->whereNull('duracion')
 				->get();
 
 			foreach ($openSessions as $openSession) {
 				$createdAt = Carbon::parse($openSession->createdAt);
 				$now = Carbon::now();
+				$durationSeconds = $now->diffInSeconds($createdAt);
 				
-
-				$totalSeconds = abs($createdAt->diffInSeconds($now));
+				// Convert seconds to TIME format (HH:MM:SS)
+				$hours = floor($durationSeconds / 3600);
+				$minutes = floor(($durationSeconds % 3600) / 60);
+				$seconds = $durationSeconds % 60;
+				$durationTime = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
 				
-				$hours = intval($totalSeconds / 3600);
-				$minutes = intval(($totalSeconds % 3600) / 60);
-				$seconds = intval($totalSeconds % 60);
-				
-				if ($hours > 23) {
-					$durationString = '23:59:59';
-				} else {
-					$durationString = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
-				}
-				
-				$openSession->duracion = $durationString;
+				// Update the session with calculated duration
+				$openSession->duracion = $durationTime;
 				$openSession->save();
 			}
+		}
 
-			// Crear una nueva sesión usando Eloquent con unguarded para forzar los valores
-			$currentDateTime = Carbon::now()->toDateTimeString();
-			
-			Log::info('Creating session', [
-				'currentDateTime' => $currentDateTime,
-				'userId' => $userId,
-			]);
-			
-			$sesion = new Sesiones();
-			$sesion->id_usuario = $userId;
-			$sesion->duracion = null;
-			$sesion->monedas_gastadas = 0;
-			$sesion->timestamps = false;
-			
-			// Forzar el setAttribute para createdAt
-			$sesion->setAttribute('createdAt', $currentDateTime);
-			$sesion->save();
-			
-			// Verificar que se guardó correctamente
-			$sesion->refresh();
-			Log::info('Session created', [
-				'id' => $sesion->id,
-				'createdAt_saved' => $sesion->createdAt,
+		$loginCredentials = [
+			'nombre_usuario' => $credentials['username'],
+			'password' => $credentials['password'],
+		];
+
+		if (Auth::attempt($loginCredentials, $request->filled('remember'))) {
+			$request->session()->regenerate();
+
+			$sesion = Sesiones::create([
+				'id_usuario' => Auth::id(),
+				'duracion' => null,
+				'monedas_gastadas' => 0,
+				'createdAt' => Carbon::now(),
 			]);
 
-			// Guardar el tiempo REAL de creación en la sesión de Laravel (no confiar en DB)
-			session([
-				'current_sesion_id' => $sesion->id,
-				'sesion_created_at' => $currentDateTime,
-			]);
+			session(['current_sesion_id' => $sesion->id]);
 
-			return redirect()->route('home');
+			return redirect()->intended('/')->with('success', '¡Bienvenido/a de nuevo!');
 		}
 
 		return back()->withErrors(['username' => 'Credenciales inválidas'])->withInput($request->only('username'));
@@ -113,65 +90,36 @@ class LoginController extends Controller
 		$sesionId = session('current_sesion_id');
 		
 		if ($sesionId) {
-			$sesion = Sesiones::find($sesionId);
-			
-			if ($sesion) {
-				// Usar el tiempo REAL de la sesión de Laravel, no el de la base de datos
-				$realCreatedAt = session('sesion_created_at');
+			try {
+				$sesion = Sesiones::find($sesionId);
 				
-				if ($realCreatedAt) {
-					$createdAt = Carbon::createFromFormat('Y-m-d H:i:s', $realCreatedAt);
+				if ($sesion && $sesion->duracion === null) {
+					// Calculate duration using Carbon
+					$createdAt = Carbon::parse($sesion->createdAt);
 					$now = Carbon::now();
+					$durationSeconds = $now->diffInSeconds($createdAt);
 					
-					// DEBUG: Ver los valores
-					Log::info('Logout Debug', [
-						'sesion_id' => $sesion->id,
-						'createdAt_from_laravel_session' => $createdAt->toDateTimeString(),
-						'createdAt_from_database' => $sesion->createdAt,
-						'now' => $now->toDateTimeString(),
-					]);
+					// Convert seconds to TIME format (HH:MM:SS)
+					$hours = floor($durationSeconds / 3600);
+					$minutes = floor(($durationSeconds % 3600) / 60);
+					$seconds = $durationSeconds % 60;
+					$durationTime = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
 					
-					// Calcular la diferencia en segundos (SIEMPRE positivo con abs)
-					$totalSeconds = abs($now->diffInSeconds($createdAt));
-					
-					Log::info('Duration Calculation', [
-						'totalSeconds' => $totalSeconds,
-					]);
-					
-					// Convertir a horas, minutos y segundos
-					$hours = intval(abs($totalSeconds / 3600));
-					$minutes = intval(abs(($totalSeconds % 3600) / 60));
-					$seconds = intval(abs($totalSeconds % 60));
-					
-					Log::info('Time Components', [
-						'hours' => $hours,
-						'minutes' => $minutes,
-						'seconds' => $seconds,
-					]);
-					
-					// SQL Server TIME solo soporta hasta 23:59:59
-					if ($hours > 23) {
-						$durationString = '23:59:59';
-					} else {
-						$durationString = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
-					}
-					
-					Log::info('Final Duration', ['duration' => $durationString]);
-					
-					$sesion->duracion = $durationString;
+					$sesion->duracion = $durationTime;
 					$sesion->save();
 				}
+			} catch (\Exception $e) {
+				Log::error('Error closing session: ' . $e->getMessage());
 			}
-			session()->forget('current_sesion_id');
-			session()->forget('sesion_created_at');
 		}
 
 		Auth::logout();
-
+		
 		$request->session()->invalidate();
+		
 		$request->session()->regenerateToken();
 
-		return redirect()->route('home');
+		return redirect()->route('home')->with('success', '¡Hasta pronto!');
 	}
 }
 
