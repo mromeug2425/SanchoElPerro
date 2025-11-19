@@ -110,10 +110,14 @@ CREATE TABLE mejoras (
     id BIGINT IDENTITY(1,1) NOT NULL,
     nombre NVARCHAR(255) NOT NULL,
     activo BIT NOT NULL DEFAULT 1,
-    nivel_1 NVARCHAR(MAX) NOT NULL,
-    nivel_2 NVARCHAR(MAX) NOT NULL,
-    nivel_3 NVARCHAR(MAX) NOT NULL,
-    nivel_4 NVARCHAR(MAX) NOT NULL,
+    img NVARCHAR(255) NOT NULL,
+    precio_nv1 BIGINT NOT NULL DEFAULT 0,
+    img_n2 VARCHAR(255) NULL,
+    precio_nv2 BIGINT NOT NULL DEFAULT 0,
+    img_n3 VARCHAR(255) NULL,
+    precio_nv3 BIGINT NOT NULL DEFAULT 0,
+    img_n4 VARCHAR(255) NULL,
+    precio_nv4 BIGINT NOT NULL DEFAULT 0,
     CONSTRAINT mejoras_id_primary PRIMARY KEY (id)
 );
 GO
@@ -317,4 +321,14 @@ INSERT INTO preguntas (id_juego, pregunta, opcion_1, opcion_2, opcion_3, opcion_
 (2, 'Cuanto es 10 al cuadrado?', '50', '100', '150', '200', 2, NULL),
 (2, 'Cuanto es 60 / 5?', '10', '12', '15', '20', 3, NULL);
 GO
+
+-- Insertar mejoras iniciales
+INSERT INTO mejoras ( nombre, activo, img, precio_nv1, precio_nv2, precio_nv3, precio_nv4) VALUES
+( 'CASA', 1, 'img/casa.png', 100, 200, 300, 400),
+( 'DUPLEX', 1, 'img/duplex.png', 150, 250, 350, 450),
+('ESTATUA DORADA', 1, 'img/estatua_dorada.png', 200, 300, 400, 500),
+( 'HELICOPTERO', 1, 'img/helicoptero.png', 250, 350, 450, 550),
+( 'PERRO', 1, 'img/perro.png', 300, 400, 500, 600);
+
+    -- alter table de nivel 5
 

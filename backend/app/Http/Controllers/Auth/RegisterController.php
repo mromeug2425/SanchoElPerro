@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Usuario;
 use App\Models\Sesiones;
+use App\Models\UsuariosMejoras;
 use Carbon\Carbon;
 
 class RegisterController extends Controller
@@ -37,44 +38,36 @@ class RegisterController extends Controller
             'password' => ['required', 'confirmed', 'min:8'],
         ]);
 
-        // Comprobar si ya existe usuario con ese nombre
-        if (Usuario::where('nombre_usuario', $data['name'])->exists()) {
-            return back()->withErrors(['name' => 'El nombre de usuario ya está en uso'])->withInput();
+        $existingUser = Usuario::where('nombre_usuario', $data['name'])->first();
+        if ($existingUser) {
+            return back()->withErrors(['name' => 'Este nombre de usuario ya está en uso'])->withInput();
         }
 
-        // Crear usuario 
-        $user = new Usuario();
-        $user->nombre_usuario = $data['name'];
-        $user->edad = $data['edad'];
-        $user->trabajo = $data['trabajo'];
-        $user->password = Hash::make($data['password']);
-        $user->tiquets_tienda = 0;
-        $user->monedas = 0;
-        $user->monedas_gastadas = 0;
-        $user->save();
+        try {
+            $user = Usuario::create([
+                'nombre_usuario' => $data['name'],
+                'password' => Hash::make($data['password']),
+                'edad' => $data['edad'],
+                'trabajo' => $data['trabajo'],
+                'tiquets_tienda' => 0,
+                'monedas' => 0,
+                'monedas_gastadas' => 0,
+            ]);
 
-        // Auto-login -
-        Auth::login($user);
-        $request->session()->regenerate();
+            Auth::login($user);
 
-        // Crear una nueva sesión usando Eloquent
-        $currentDateTime = Carbon::now()->toDateTimeString();
-        
-        $sesion = new Sesiones();
-        $sesion->id_usuario = $user->id;
-        $sesion->duracion = null;
-        $sesion->monedas_gastadas = 0;
-        // Guardar como string en formato SQL Server DATETIME (Y-m-d H:i:s)
-        $sesion->createdAt = $currentDateTime;
-        
-        $sesion->timestamps = false;
-        $sesion->save();
+            $sesion = Sesiones::create([
+                'id_usuario' => $user->id,
+                'duracion' => null,
+                'monedas_gastadas' => 0,
+                'createdAt' => Carbon::now(),
+            ]);
 
-        session([
-            'current_sesion_id' => $sesion->id,
-            'sesion_created_at' => $currentDateTime,
-        ]);
+            session(['current_sesion_id' => $sesion->id]);
 
-        return view('home');
+            return redirect()->route('home')->with('success', '¡Bienvenido/a a Sancho El Perro!');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Error al crear la cuenta. Por favor, intenta de nuevo.'])->withInput();
+        }
     }
 }
