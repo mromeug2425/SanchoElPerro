@@ -24,6 +24,9 @@ class SimpleMathGame {
         return answer === this.solution;
     }
 }
+let tiempoLimite = 15;
+let tiempoRestante = 15;
+let intervaloTimer = null;
 
 let game;
 let currentProblem;
@@ -43,9 +46,7 @@ function startNewGame() {
     leftP.textContent = `${currentProblem.numbers[0]} + ${currentProblem.numbers[1]}`;
     rightP.textContent = `${currentProblem.numbers[2]} + ?`;
 
-    const msg = document.getElementById('mensaje');
-    msg.textContent = '';
-    msg.classList.remove('text-green-500', 'text-red-500');
+    iniciarTimer();
 
     const options = generateOptions(currentProblem.solution);
     const buttons = document.querySelectorAll('button[data-option]');
@@ -53,6 +54,7 @@ function startNewGame() {
     buttons.forEach((btn, i) => {
         btn.textContent = options[i];
         btn.dataset.value = options[i];
+        btn.disabled = false; 
     });
 }
 
@@ -65,18 +67,103 @@ function generateOptions(correct) {
     return opts.sort(() => Math.random() - 0.5);
 }
 
+function iniciarTimer() {
+    if (intervaloTimer) {
+        clearInterval(intervaloTimer);
+    }
+    
+    tiempoRestante = tiempoLimite;
+    actualizarDisplayTimer();
+    
+    intervaloTimer = setInterval(() => {
+        tiempoRestante--;
+        actualizarDisplayTimer();
+        
+        const timerElement = document.getElementById('tiempo-restante');
+        if (tiempoRestante <= 5) {
+            timerElement.style.color = '#ef4444';
+        } else {
+            timerElement.style.color = '#966E31';
+        }
+        
+        if (tiempoRestante <= 0) {
+            clearInterval(intervaloTimer);
+            tiempoAgotado();
+        }
+    }, 1000);
+}
+
+function actualizarDisplayTimer() {
+    const timerElement = document.getElementById('tiempo-restante');
+    if (timerElement) {
+        timerElement.textContent = tiempoRestante;
+    }
+}
+
+function tiempoAgotado() {
+    deshabilitarBotones();
+    mostrarPopup('¡TIEMPO AGOTADO!', 'Se acabó el tiempo para responder esta pregunta.', false);
+}
+
+function deshabilitarBotones() {
+    const buttons = document.querySelectorAll('button[data-option]');
+    buttons.forEach(btn => {
+        btn.disabled = true;
+    });
+}
+
+function habilitarBotones() {
+    const buttons = document.querySelectorAll('button[data-option]');
+    buttons.forEach(btn => {
+        btn.disabled = false;
+    });
+}
+
 function comprobar(btn) {
+    clearInterval(intervaloTimer);
+    deshabilitarBotones();
+    
     const selected = parseInt(btn.dataset.value);
-    const msg = document.getElementById('mensaje');
 
     if (game.verifySolution(selected)) {
-        msg.textContent = '¡Correcto! ⚖️';
-        msg.classList.remove('text-red-500');
-        msg.classList.add('text-green-500');
-        setTimeout(startNewGame, 1000);
+        mostrarPopup('¡CORRECTO!', '¡Excelente! Has acertado la respuesta.', true);
     } else {
-        msg.textContent = '¡Incorrecto! ❌ Intenta otra vez';
-        msg.classList.remove('text-green-500');
-        msg.classList.add('text-red-500');
+        mostrarPopup('INCORRECTO', `La respuesta correcta era ${currentProblem.solution}.`, false);
     }
+}
+
+function mostrarPopup(titulo, mensaje, esCorrecto) {
+    const popup = document.getElementById('popup-resultado');
+    const popupContenido = document.getElementById('popup-contenido');
+    const popupTitulo = document.getElementById('popup-titulo');
+    const popupMensaje = document.getElementById('popup-mensaje');
+    
+    if (esCorrecto) {
+        popupContenido.style.borderColor = '#22c55e';
+        popupTitulo.style.color = '#22c55e';
+        popupTitulo.textContent = titulo;
+    } else {
+        popupContenido.style.borderColor = '#ef4444';
+        popupTitulo.style.color = '#ef4444';
+        popupTitulo.textContent = titulo;
+    }
+    
+    popupMensaje.textContent = mensaje;
+    popupMensaje.style.color = '#4b5563';
+    
+    popup.classList.remove('hidden');
+    setTimeout(() => {
+        popupContenido.style.transform = 'scale(1)';
+    }, 10);
+}
+
+function cerrarPopup() {
+    const popup = document.getElementById('popup-resultado');
+    const popupContenido = document.getElementById('popup-contenido');
+    
+    popupContenido.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+        popup.classList.add('hidden');
+        startNewGame();
+    }, 200);
 }
