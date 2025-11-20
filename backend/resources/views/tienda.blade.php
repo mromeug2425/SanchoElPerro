@@ -12,6 +12,16 @@
 		<div class="absolute top-4 left-4 z-20">
 		<x-boton color="gray" text="Atrás" size="md" height="small" href="{{ route('home') }}" />
 	</div>
+
+	<!-- Visor de monedas -->
+	<div class="absolute top-4 right-4 z-20">
+		<div class="bg-yellow-400 border-4 border-yellow-600 rounded-lg px-6 py-3 shadow-lg">
+			<div class="flex items-center gap-2">
+				<span class="text-2xl">💰</span>
+				<span class="text-xl font-bold text-gray-800">{{ $monedas }}</span>
+			</div>
+		</div>
+	</div>
 	
 	<main class="flex-1 flex items-center justify-end pr-16">
 		<!-- Caja contenedora con estilo de diálogo -->
@@ -19,17 +29,18 @@
 			<div class="flex flex-col gap-6 items-center">
 				@forelse($mejoras as $mejora)
 					<!-- Mejora {{ $mejora->id }} -->
-					<div class="w-80">
+					<form class="mejora-form" data-mejora-id="{{ $mejora->id }}" data-precio="{{ $mejora->precio_actual }}">
+						@csrf
 						<x-boton
 							color="#428121"
-							text="{{ $mejora->nombre }} - {{ $mejora->precio_actual }} monedas (Nivel {{ $mejora->nivel_actual + 1 }})"
+							text="{{ $mejora->nombre }} - {{ $mejora->es_nivel_maximo ? 'MAX. LVL' : $mejora->precio_actual . ' monedas (Nivel ' . ($mejora->nivel_actual + 1) . ')' }}"
 							size="lg"
 							height="normal"
 							border_color="#000000"
-							type="button"
+							type="submit"
 							class="w-full whitespace-normal break-words"
 						/>
-					</div>
+					</form>
 				@empty
 					<p class="text-white text-center">No hay mejoras disponibles</p>
 				@endforelse
@@ -46,6 +57,10 @@
 		<div class="absolute bottom-16 left-1/2 transform -translate-x-1/2 z-20 w-full max-w-3xl px-4">
 			<x-dialogo bg_color="#D9D9D9" border_color="#000000" text="¡Bienvenido {{ $nombreUsuario }}!, !haz mas grande y libre tu homepage comprando mejoras en esta tienda local de barrio!" />
 		</div>
-	</main>		<!-- Imagen del toro abajo a la izquierda -->
+	</main>	
+	<script>
+    window.comprarMejoraUrl = "{{ route('mejoras.comprar') }}";
+	</script>
+<script src="{{ asset('js/tienda.js') }}"></script>
 @endsection
 

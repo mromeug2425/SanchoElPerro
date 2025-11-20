@@ -33,15 +33,26 @@ class NavigationController extends Controller
             $campoPrecios = 'precio_nv' . $siguienteNivel;
             $mejora->precio_actual = $mejora->$campoPrecios ?? 0;
             $mejora->nivel_actual = $nivelActual;
+            $mejora->es_nivel_maximo = $nivelActual >=4;
+
+            if($mejora->es_nivel_maximo){
+                $mejora->precio_actual = 0; 
+            } else {
+                $campoPrecios = 'precio_nv' . $siguienteNivel;
+                $mejora->precio_actual = $mejora-> $campoPrecios ?? 0;
+            }
             
             return $mejora;
         });
+
+        $monedasUsuario = $usuario->monedas;
 
         $nombreUsuario = $usuario->nombre_usuario;
 
         return view('tienda', [
             'mejoras' => $mejorasConPrecio,
-            'nombreUsuario' => $nombreUsuario
+            'nombreUsuario' => $nombreUsuario,
+            'monedas' => $monedasUsuario
         ]);
     }
 
