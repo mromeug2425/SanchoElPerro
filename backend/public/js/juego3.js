@@ -240,6 +240,10 @@ function handleDragEnd(e) {
 }
 
 function handleDragOver(e) {
+    if (!dragAndDropHabilitado) {
+        return false;
+    }
+    
     e.preventDefault();
     e.stopPropagation();
     e.dataTransfer.dropEffect = 'move';
@@ -250,6 +254,23 @@ function handleDragOver(e) {
     }
     
     return false;
+}
+function resetearDropZone() {
+    const dropZone = document.getElementById('drop-zone');
+    dropZone.innerHTML = `
+        <div class="text-center">
+            <svg class="w-24 h-24 mx-auto mb-4 text-[#966E31] opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+            </svg>
+            <p class="text-2xl font-jersey text-[#966E31] font-bold">Arrastra aquí la respuesta correcta</p>
+        </div>
+    `;
+    dropZone.classList.remove('drag-over');
+    
+    // CRÍTICO: Re-agregar los event listeners después de cambiar el HTML
+    dropZone.addEventListener('dragover', handleDragOver);
+    dropZone.addEventListener('dragleave', handleDragLeave);
+    dropZone.addEventListener('drop', handleDrop);
 }
 
 function handleDragLeave(e) {
@@ -263,17 +284,25 @@ function handleDrop(e) {
     e.stopPropagation();
     e.preventDefault();
     
+    console.log('📦 Drop event triggered');
+    console.log('📦 dragAndDropHabilitado:', dragAndDropHabilitado);
+    console.log('📦 opcionArrastrada:', opcionArrastrada);
+    
     const dropZone = document.getElementById('drop-zone');
     if (dropZone) {
         dropZone.classList.remove('drag-over');
     }
     
-    console.log('📦 Drop detectado. Opción:', opcionArrastrada);
+    // Obtener la opción desde dataTransfer si opcionArrastrada es null
+    const opcion = opcionArrastrada || e.dataTransfer.getData('text/plain');
+    console.log('📦 Opción final:', opcion);
     
-    if (opcionArrastrada && dragAndDropHabilitado) {
+    if (opcion && dragAndDropHabilitado) {
         dragAndDropHabilitado = false;
         deshabilitarOpciones();
-        verificarRespuesta(parseInt(opcionArrastrada));
+        verificarRespuesta(parseInt(opcion));
+    } else {
+        console.error('❌ No se pudo obtener la opción o drag está deshabilitado');
     }
     
     return false;
