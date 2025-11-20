@@ -131,11 +131,8 @@
 		</div>
 	</div>
 
+	<script src="{{ asset('js/juego2animaciones.js') }}"></script>
+	<script src="{{ asset('js/juego2quicktime.js') }}"></script>
+	<script src="{{ asset('js/juego2popups.js') }}"></script>
 	<script src="{{ asset('js/juego2.js') }}"></script>
-	<script>
-		// Inicializar el juego 2 al cargar la página
-		document.addEventListener('DOMContentLoaded', function() {
-			cargarPreguntas(2); // Cargar preguntas del juego 2
-		});
-	</script>
 @endsection
