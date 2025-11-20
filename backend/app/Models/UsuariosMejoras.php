@@ -18,4 +18,9 @@ class UsuariosMejoras extends Model
     public function usuarios() {
         return $this->belongsTo(Usuario::class, 'id');
     }
+
+    public function usuariosMejoras(){
+        return $this->hasMany(UsuariosMejoras::class, 'id_usuario');
+    }
+
 }
