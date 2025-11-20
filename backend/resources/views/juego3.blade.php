@@ -93,6 +93,5 @@
 		</div>
 	</div>
 	<script src="{{ asset('js/juego3.js') }}"></script>
-	<link rel="stylesheet" href="{{ asset('css/deagableJuego3.css') }}">
 @endsection
 
