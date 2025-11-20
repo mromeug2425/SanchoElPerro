@@ -12,7 +12,8 @@ let posicionCamello = 0;
 
 //  FUNCIONES DE PREGUNTAS 
 function cargarPreguntas(idJuego) {
-    fetch("/preguntas/" + idJuego)
+    const baseUrl = window.BASE_URL || window.location.origin;
+    fetch(baseUrl + "/preguntas/" + idJuego)
         .then(function(response) {
             return response.json();
         })
