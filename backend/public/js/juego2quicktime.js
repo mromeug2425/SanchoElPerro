@@ -12,13 +12,14 @@ function iniciarQTE() {
     // Cambiar la imagen del jugador a la imagen que hace un truco
     const contenedorPlayer = document.getElementById("contenedor-player");
     const imagenPlayer = contenedorPlayer.querySelector("img");
+    const baseUrl = window.BASE_URL || window.location.origin;
     if (imagenPlayer) {
         imagenOriginalPlayer = imagenPlayer.src;
-        imagenPlayer.src = "/img/personajes/player/personajeskate.png";
+        imagenPlayer.src = baseUrl + "/img/personajes/player/personajeskate.png";
     }
     
     
-    audioMLG = new Audio("/audio/juegos/juego2/MLG.mp3");
+    audioMLG = new Audio(baseUrl + "/audio/juegos/juego2/MLG.mp3");
     audioMLG.volume = 1;  
     
     
