@@ -332,3 +332,8 @@ INSERT INTO mejoras ( nombre, activo, img, precio_nv1, precio_nv2, precio_nv3, p
 
     -- alter table de nivel 5
 
+
+INSERT INTO juegos (nombre, tiempo, cantidad_preguntas) VALUES
+('Juego 4', '00:02:00', 4);
+GO
+

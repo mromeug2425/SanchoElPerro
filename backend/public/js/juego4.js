@@ -1,68 +1,50 @@
-/**
- * Juego 4 - Math Challenge Game
- * Goal: Use given numbers and operations to reach the target number
- */
-
 class MathChallengeGame {
     constructor() {
         this.targetNumber = 0;
-        this.availableNumbers = [];
-        this.availableOperations = ["+", "-", "*", "/"];
-        this.solution = null;
-        this.maxAttempts = 100; // Max attempts to find a valid problem
+        this.correctNumbers = [];
+        this.correctOperations = [];
+        this.allNumbers = [];
+        this.allOperations = [];
+        this.decoyIndices = {
+            numbers: [],
+            operations: [],
+        };
+        this.maxAttempts = 50;
     }
 
-    /**
-     * Generate a random integer between min and max (inclusive)
-     */
     getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    /**
-     * Generate random numbers for the challenge
-     */
-    generateNumbers(count = 4, min = 1, max = 20) {
-        const numbers = [];
-        for (let i = 0; i < count; i++) {
-            numbers.push(this.getRandomInt(min, max));
-        }
-        return numbers;
+    isInteger(value) {
+        return Number.isInteger(value);
     }
 
-    /**
-     * Generate random operations
-     */
-    generateOperations(count = 3) {
-        const operations = [];
-        const ops = ["+", "-", "*", "/"];
-        for (let i = 0; i < count; i++) {
-            operations.push(ops[this.getRandomInt(0, ops.length - 1)]);
+    shuffleArray(array) {
+        // Fisher-Yates shuffle
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
         }
-        return operations;
+        return shuffled;
     }
 
-    /**
-     * Evaluate a mathematical expression
-     */
     evaluateExpression(numbers, operations) {
         if (numbers.length !== operations.length + 1) {
             return null;
         }
 
         try {
-            // Build expression string
             let expression = numbers[0].toString();
             for (let i = 0; i < operations.length; i++) {
                 expression += operations[i] + numbers[i + 1];
             }
 
-            // Evaluate using eval (safe in this controlled environment)
             const result = eval(expression);
 
-            // Return only if result is a valid number and not too large
             if (isFinite(result) && !isNaN(result)) {
-                return Math.round(result * 100) / 100; // Round to 2 decimals
+                return result;
             }
             return null;
         } catch (e) {
@@ -70,162 +52,199 @@ class MathChallengeGame {
         }
     }
 
-    /**
-     * Generate all permutations of an array
-     */
-    permute(arr) {
-        if (arr.length <= 1) return [arr];
-
-        const result = [];
-        for (let i = 0; i < arr.length; i++) {
-            const current = arr[i];
-            const remaining = arr.slice(0, i).concat(arr.slice(i + 1));
-            const perms = this.permute(remaining);
-
-            for (const perm of perms) {
-                result.push([current, ...perm]);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Find a solution using given numbers and operations to reach target
-     */
-    findSolution(target, numbers, operations) {
-        // Try all permutations of numbers
-        const numberPerms = this.permute(numbers);
-
-        // Try all permutations of operations
-        const opPerms = this.permute(operations);
-
-        // Try each combination
-        for (const numPerm of numberPerms) {
-            for (const opPerm of opPerms) {
-                const result = this.evaluateExpression(numPerm, opPerm);
-
-                if (result !== null && Math.abs(result - target) < 0.01) {
-                    // Found a solution!
-                    return {
-                        numbers: numPerm,
-                        operations: opPerm,
-                        expression: this.buildExpressionString(numPerm, opPerm),
-                        result: result,
-                    };
-                }
-            }
-        }
-
-        return null; // No solution found
-    }
-
-    /**
-     * Build a readable expression string
-     */
-    buildExpressionString(numbers, operations) {
-        let expr = numbers[0].toString();
-        for (let i = 0; i < operations.length; i++) {
-            expr += " " + operations[i] + " " + numbers[i + 1];
-        }
-        return expr;
-    }
-
-    /**
-     * Generate a new challenge with a guaranteed solution
-     */
-    generateChallenge() {
+    generateValidExpression() {
         let attempts = 0;
 
         while (attempts < this.maxAttempts) {
             attempts++;
 
-            // Generate random numbers and operations
-            const numbers = this.generateNumbers(4, 1, 20);
-            const operations = this.generateOperations(3);
+            // Generate 4 numbers and 3 operations
+            const numbers = [];
+            for (let i = 0; i < 4; i++) {
+                numbers.push(this.getRandomInt(1, 12));
+            }
 
-            // Calculate what result we get with these
+            const operations = [];
+            const ops = ["+", "-", "*", "/"];
+            for (let i = 0; i < 3; i++) {
+                operations.push(ops[this.getRandomInt(0, ops.length - 1)]);
+            }
+
+            // Check for division by zero
+            let hasDivisionByZero = false;
+            for (let i = 0; i < operations.length; i++) {
+                if (operations[i] === "/" && numbers[i + 1] === 0) {
+                    hasDivisionByZero = true;
+                    break;
+                }
+            }
+
+            if (hasDivisionByZero) continue;
+
+            // Evaluate the expression
             const result = this.evaluateExpression(numbers, operations);
 
-            // If valid result, use it as target and try to find solution
-            if (result !== null && result > 0 && result < 1000) {
-                const target = Math.round(result);
-                const solution = this.findSolution(target, numbers, operations);
-
-                if (solution) {
-                    // Found a valid challenge!
-                    this.targetNumber = target;
-                    this.availableNumbers = numbers;
-                    this.availableOperations = operations;
-                    this.solution = solution;
-
-                    return {
-                        target: this.targetNumber,
-                        numbers: this.availableNumbers,
-                        operations: this.availableOperations,
-                        solution: this.solution, // For debugging/hints
-                    };
-                }
+            // Check if result is an integer and within bounds (-200 to 200)
+            if (
+                result !== null &&
+                this.isInteger(result) &&
+                result >= -200 &&
+                result <= 200
+            ) {
+                return {
+                    numbers: numbers,
+                    operations: operations,
+                    target: result,
+                };
             }
         }
 
-        // Fallback: generate a simple challenge
-        return this.generateSimpleChallenge();
-    }
+        // Fallback: use only addition and subtraction if max attempts reached
+        console.log("Using fallback generation (no division/multiplication)");
+        let fallbackAttempts = 0;
 
-    /**
-     * Generate a simple guaranteed challenge (fallback)
-     */
-    generateSimpleChallenge() {
-        const num1 = this.getRandomInt(1, 10);
-        const num2 = this.getRandomInt(1, 10);
-        const num3 = this.getRandomInt(1, 10);
-        const num4 = this.getRandomInt(1, 10);
+        while (fallbackAttempts < 20) {
+            fallbackAttempts++;
 
-        const operations = ["+", "-", "*"];
+            const numbers = [];
+            for (let i = 0; i < 4; i++) {
+                numbers.push(this.getRandomInt(1, 50));
+            }
 
-        // Calculate target: num1 * num2 + num3 - num4
-        const target = num1 * num2 + num3 - num4;
+            const operations = [];
+            const simpleOps = ["+", "-"];
+            for (let i = 0; i < 3; i++) {
+                operations.push(
+                    simpleOps[this.getRandomInt(0, simpleOps.length - 1)]
+                );
+            }
 
-        this.targetNumber = target;
-        this.availableNumbers = [num1, num2, num3, num4];
-        this.availableOperations = operations;
+            const result = this.evaluateExpression(numbers, operations);
 
-        const solution = this.findSolution(
-            target,
-            this.availableNumbers,
-            operations
-        );
-        this.solution = solution;
+            // Check if fallback result is also within bounds
+            if (result !== null && result >= -200 && result <= 200) {
+                return {
+                    numbers: numbers,
+                    operations: operations,
+                    target: result,
+                };
+            }
+        }
+
+        // Ultimate fallback: simple addition
+        const numbers = [10, 20, 30, 40];
+        const operations = ["+", "+", "+"];
+        const result = this.evaluateExpression(numbers, operations);
 
         return {
-            target: this.targetNumber,
-            numbers: this.availableNumbers,
-            operations: this.availableOperations,
-            solution: this.solution,
+            numbers: numbers,
+            operations: operations,
+            target: result,
         };
     }
 
-    /**
-     * Verify if a player's solution is correct
-     */
+    generateDecoys(existingNumbers, existingOperations) {
+        // Generate 2 decoy numbers
+        const decoyNumbers = [];
+        for (let i = 0; i < 2; i++) {
+            decoyNumbers.push(this.getRandomInt(1, 12));
+        }
+
+        // Generate 1 decoy operation
+        const ops = ["+", "-", "*", "/"];
+        const decoyOperation = ops[this.getRandomInt(0, ops.length - 1)];
+
+        return {
+            numbers: decoyNumbers,
+            operation: decoyOperation,
+        };
+    }
+
+    generateChallenge() {
+        // Step 1: Generate valid expression with integer result
+        const expression = this.generateValidExpression();
+
+        // Store the correct solution
+        this.correctNumbers = [...expression.numbers];
+        this.correctOperations = [...expression.operations];
+        this.targetNumber = expression.target;
+
+        // Step 2: Generate decoys
+        const decoys = this.generateDecoys(
+            expression.numbers,
+            expression.operations
+        );
+
+        // Step 3: Combine and track indices before shuffling
+        const numbersWithIndices = expression.numbers.map((num, idx) => ({
+            value: num,
+            originalIdx: idx,
+            isDecoy: false,
+        }));
+        const decoyNumbersWithIndices = decoys.numbers.map((num, idx) => ({
+            value: num,
+            originalIdx: 4 + idx,
+            isDecoy: true,
+        }));
+        const allNumbersWithIndices = [
+            ...numbersWithIndices,
+            ...decoyNumbersWithIndices,
+        ];
+
+        const operationsWithIndices = expression.operations.map((op, idx) => ({
+            value: op,
+            originalIdx: idx,
+            isDecoy: false,
+        }));
+        const decoyOperationWithIndex = {
+            value: decoys.operation,
+            originalIdx: 3,
+            isDecoy: true,
+        };
+        const allOperationsWithIndices = [
+            ...operationsWithIndices,
+            decoyOperationWithIndex,
+        ];
+
+        // Step 4: Shuffle
+        const shuffledNumbers = this.shuffleArray(allNumbersWithIndices);
+        const shuffledOperations = this.shuffleArray(allOperationsWithIndices);
+
+        // Step 5: Extract values and decoy indices
+        this.allNumbers = shuffledNumbers.map((item) => item.value);
+        this.allOperations = shuffledOperations.map((item) => item.value);
+
+        this.decoyIndices.numbers = shuffledNumbers
+            .map((item, idx) => (item.isDecoy ? idx : -1))
+            .filter((idx) => idx !== -1);
+
+        this.decoyIndices.operations = shuffledOperations
+            .map((item, idx) => (item.isDecoy ? idx : -1))
+            .filter((idx) => idx !== -1);
+
+        console.log("Challenge generated!");
+        console.log("Target:", this.targetNumber);
+        console.log(
+            "Correct solution:",
+            this.correctNumbers.join(" "),
+            "with operations:",
+            this.correctOperations.join(" ")
+        );
+
+        return {
+            target: this.targetNumber,
+            numbers: this.allNumbers,
+            operations: this.allOperations,
+            decoyIndices: this.decoyIndices,
+        };
+    }
+
     verifySolution(numbers, operations) {
         const result = this.evaluateExpression(numbers, operations);
-        return result !== null && Math.abs(result - this.targetNumber) < 0.01;
+        return result !== null && result === this.targetNumber;
     }
 }
 
-// Export for use in browser
 if (typeof window !== "undefined") {
     window.MathChallengeGame = MathChallengeGame;
 }
-
-// Example usage:
-/*
-const game = new MathChallengeGame();
-const challenge = game.generateChallenge();
-
-console.log('Target:', challenge.target);
-console.log('Numbers:', challenge.numbers);
-console.log('Operations:', challenge.operations);
-console.log('Solution:', challenge.solution.expression, '=', challenge.solution.result);
-*/
