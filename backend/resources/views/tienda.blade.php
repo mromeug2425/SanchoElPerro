@@ -22,7 +22,7 @@
 					<div class="w-80">
 						<x-boton
 							color="#428121"
-							text="{{ $mejora->nombre }} - {{ $mejora->precio_nv1 }} monedas"
+							text="{{ $mejora->nombre }} - {{ $mejora->precio_actual }} monedas (Nivel {{ $mejora->nivel_actual + 1 }})"
 							size="lg"
 							height="normal"
 							border_color="#000000"

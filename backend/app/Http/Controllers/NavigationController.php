@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Mejoras;
 use Illuminate\Http\Request;
+use App\Models\UsuariosMejoras;
 use Illuminate\Support\Facades\Log;
 
 class NavigationController extends Controller
@@ -15,13 +16,33 @@ class NavigationController extends Controller
 
     public function tienda()
     {
-        Log::info('Usuario autenticado:', ['user' => auth()->user()->nombre_usuario]);
+        $usuario = auth()->user();
+        
         $mejoras = Mejoras::where('activo', 1)
                         ->orderBy('id')
                         ->get();
+        
+        $mejorasConPrecio = $mejoras->map(function($mejora) use ($usuario) {
+            $usuarioMejora = UsuariosMejoras::where('id_usuario', $usuario->id)
+                                            ->where('id_mejora', $mejora->id)
+                                            ->first();
+            
+            $nivelActual = $usuarioMejora ? $usuarioMejora->nivel : 0;
+            $siguienteNivel = $nivelActual + 1;
+            
+            $campoPrecios = 'precio_nv' . $siguienteNivel;
+            $mejora->precio_actual = $mejora->$campoPrecios ?? 0;
+            $mejora->nivel_actual = $nivelActual;
+            
+            return $mejora;
+        });
 
+        $nombreUsuario = $usuario->nombre_usuario;
 
-        return view('tienda', ['mejoras' => $mejoras, 'nombreUsuario' => auth()->user()->nombre_usuario]);
+        return view('tienda', [
+            'mejoras' => $mejorasConPrecio,
+            'nombreUsuario' => $nombreUsuario
+        ]);
     }
 
     public function niveles()
