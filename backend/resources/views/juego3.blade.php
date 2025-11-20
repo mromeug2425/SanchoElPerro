@@ -2,6 +2,10 @@
 
 @section('title', config('app.name', 'SanchoElPerro') . ' - Juego 3')
 
+@push('styles')
+	<link rel="stylesheet" href="{{ asset('css/dragableJuego3.css') }}">
+@endpush
+
 @php
 	$backgroundImage = asset('img/backgrounds/joc3.png');
 @endphp
@@ -34,20 +38,48 @@
 		</div>
 
 		<main class="flex-1 flex items-center justify-center">
-			<div class="animate-fade-in-scale">
+			<div id="drop-zone" class="w-full max-w-2xl mx-auto border-4 border-dashed border-[#966E31] bg-white/30 rounded-2xl p-8 transition-all duration-300">
+				<div class="text-center">
+					<svg class="w-24 h-24 mx-auto mb-4 text-[#966E31] opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+					</svg>
+					<p class="text-2xl font-jersey text-[#966E31] font-bold">Arrastra aquí la respuesta correcta</p>
+				</div>
 			</div>
 		</main>
-
 		<!-- Botones en la parte inferior -->
 		<div class="w-full max-w-full p-4">
 			<div class="grid grid-cols-2 gap-4">
-				<button id="opcion1" class="bg-[#966E31] hover:brightness-75 hover:scale-95 text-white font-medium rounded-lg px-5 py-6 text-md transition-all duration-200" onclick="verificarRespuesta(1)">Opción 1</button>
-				<button id="opcion2" class="bg-[#572009] hover:brightness-75 hover:scale-95 text-white font-medium rounded-lg px-5 py-6 text-md transition-all duration-200" onclick="verificarRespuesta(2)">Opción 2</button>
-				<button id="opcion3" class="bg-[#814113] hover:brightness-75 hover:scale-95 text-white font-medium rounded-lg px-5 py-6 text-md transition-all duration-200" onclick="verificarRespuesta(3)">Opción 3</button>
-				<button id="opcion4" class="bg-[#96601A] hover:brightness-75 hover:scale-95 text-white font-medium rounded-lg px-5 py-6 text-md transition-all duration-200" onclick="verificarRespuesta(4)">Opción 4</button>
+				<button 
+					id="opcion1" 
+					draggable="true" 
+					data-opcion="1"
+					class="bg-[#966E31] hover:brightness-75 hover:scale-95 text-white font-medium rounded-lg px-5 py-6 text-md transition-all duration-200 cursor-grab active:cursor-grabbing select-none touch-none">
+					Opción 1
+				</button>
+				<button 
+					id="opcion2" 
+					draggable="true" 
+					data-opcion="2"
+					class="bg-[#572009] hover:brightness-75 hover:scale-95 text-white font-medium rounded-lg px-5 py-6 text-md transition-all duration-200 cursor-grab active:cursor-grabbing select-none touch-none">
+					Opción 2
+				</button>
+				<button 
+					id="opcion3" 
+					draggable="true" 
+					data-opcion="3"
+					class="bg-[#814113] hover:brightness-75 hover:scale-95 text-white font-medium rounded-lg px-5 py-6 text-md transition-all duration-200 cursor-grab active:cursor-grabbing select-none touch-none">
+					Opción 3
+				</button>
+				<button 
+					id="opcion4" 
+					draggable="true" 
+					data-opcion="4"
+					class="bg-[#96601A] hover:brightness-75 hover:scale-95 text-white font-medium rounded-lg px-5 py-6 text-md transition-all duration-200 cursor-grab active:cursor-grabbing select-none touch-none">
+					Opción 4
+				</button>
 			</div>
 		</div>
-	</div>
 
 	<!-- Popup personalizado -->
 	<div id="popup-resultado" class="fixed inset-0 flex items-center justify-center z-50 hidden">
@@ -60,8 +92,7 @@
 			</button>
 		</div>
 	</div>
-
-	<script src="{{ asset('js/juego3TimeEvents.js') }}"></script>
-	<script src="{{ asset('js/preguntas.js') }}"></script>
+	<script src="{{ asset('js/juego3.js') }}"></script>
+	<link rel="stylesheet" href="{{ asset('css/deagableJuego3.css') }}">
 @endsection
 
