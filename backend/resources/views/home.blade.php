@@ -14,26 +14,27 @@
 			<div class="absolute top-4 right-4 z-20">
 				<form method="POST" action="{{ route('logout') }}">
 					@csrf
-					<button type="submit" 
-						class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-full shadow-lg uppercase tracking-wider text-sm transition-all duration-200 hover:scale-105">
-						Cerrar Sesión
-					</button>
+					<x-boton color="#dc2626" text="Cerrar Sesión" size="sm" height="small" type="submit" width="auto" />
 				</form>
+			</div>
+
+			<div class="relative w-full h-full">
+				@foreach($mejoras as $mejora)
+					<img src="{{ asset(str_replace('img/', 'img/mejoras/', $mejora->img)) }}" 
+						class="mejora-img absolute" 
+						data-mejora-id="{{ $mejora->id }}"
+						data-comprada="{{ in_array($mejora->id, $mejorasCompradas) ? 'true' : 'false' }}"
+						alt="{{ $mejora->nombre }}">
+				@endforeach
 			</div>
 
 			<!-- Botones de Tienda y Juegos a la derecha (cuando está autenticado) -->
 			<div class="absolute right-8 bottom-32 z-20 flex flex-col gap-6">
 				<!-- Botón TIENDA -->
-				<a href="{{ route('tienda') }}" 
-				class="bg-gradient-to-b from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white font-black py-6 px-16 rounded-2xl shadow-2xl hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)] uppercase tracking-wider text-2xl border-4 border-black transition-all duration-200 hover:scale-110 hover:-translate-y-1 active:scale-105 [text-shadow:_2px_2px_0_rgb(0_0_0)]">
-					Tienda
-				</a>
+				<x-boton color="#a855f7" text="Tienda" size="lg" height="xlarge" href="{{ route('tienda') }}" border_color="black" />
 
 				<!-- Botón JUEGOS -->
-				<a href="{{ route('niveles') }}" 
-				class="bg-gradient-to-b from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-black py-6 px-16 rounded-2xl shadow-2xl hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)] uppercase tracking-wider text-2xl border-4 border-black transition-all duration-200 hover:scale-110 hover:-translate-y-1 active:scale-105 [text-shadow:_2px_2px_0_rgb(0_0_0)]">
-					Juegos
-				</a>
+				<x-boton color="#3b82f6" text="Juegos" size="lg" height="xlarge" href="{{ route('niveles') }}" border_color="black" />
 			</div>
 		@endauth
 
@@ -42,18 +43,14 @@
 			<div class="flex flex-col md:flex-row gap-6 animate-fade-in-scale">
 				@guest
 					<!-- Botón LOG IN -->
-					<a href="{{ route('login') }}" 
-					class="bg-gradient-to-b from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-white font-black py-6 px-16 rounded-2xl shadow-2xl hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)] uppercase tracking-wider text-2xl border-4 border-black transition-all duration-200 hover:scale-110 hover:-translate-y-1 active:scale-105 [text-shadow:_2px_2px_0_rgb(0_0_0)]">
-						Log In
-					</a>
+					<x-boton color="#facc15" text="Log In" size="lg" height="xlarge" href="{{ route('login') }}" border_color="black" />
 
 					<!-- Botón REGISTER -->
-					<a href="{{ route('register') }}" 
-					class="bg-gradient-to-b from-gray-700 to-gray-900 hover:from-gray-600 hover:to-gray-800 text-white font-black py-6 px-16 rounded-2xl shadow-2xl hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)] uppercase tracking-wider text-2xl border-4 border-black transition-all duration-200 hover:scale-110 hover:-translate-y-1 active:scale-105 [text-shadow:_2px_2px_0_rgb(0_0_0)]">
-						Register
-					</a>
+					<x-boton color="#374151" text="Register" size="lg" height="xlarge" href="{{ route('register') }}" border_color="black" />
 				@endguest
 			</div>
 		</main>
 	</div>
+
+	<script src="{{ asset('js/mejoras.js') }}"></script>
 @endsection

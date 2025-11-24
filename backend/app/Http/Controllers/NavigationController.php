@@ -9,10 +9,23 @@ use Illuminate\Support\Facades\Log;
 
 class NavigationController extends Controller
 {
-    public function home()
-    {
-        return view('home');
+    public function home(){
+    $usuario = auth()->user();
+    
+    // Obtener todas las mejoras
+    $mejoras = Mejoras::all();
+    
+    // Obtener las mejoras que el usuario tiene compradas (nivel > 0)
+    $mejorasCompradas = [];
+    if ($usuario) {
+        $mejorasCompradas = UsuariosMejoras::where('id_usuario', $usuario->id)
+            ->where('nivel', '>', 0)
+            ->pluck('id_mejora')
+            ->toArray();
     }
+    
+    return view('home', compact('mejoras', 'mejorasCompradas'));
+}
 
     public function tienda()
     {
