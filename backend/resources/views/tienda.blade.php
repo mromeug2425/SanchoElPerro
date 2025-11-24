@@ -10,8 +10,11 @@
 	<div class="w-full h-full flex flex-col p-8 relative">
 		<!-- Botón Atrás -->
 		<div class="absolute top-4 left-4 z-20">
-		<x-boton color="gray" text="Atrás" size="md" height="small" href="{{ route('home') }}" />
-	</div>
+			<a href="{{ route('home') }}" 
+				class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg shadow-lg uppercase tracking-wider text-sm transition-all duration-200 hover:scale-105 border-2 border-black">
+				Atrás
+			</a>
+		</div>
 
 	<!-- Visor de monedas -->
 	<div class="absolute top-4 right-4 z-20">
@@ -29,17 +32,12 @@
 			<div class="flex flex-col gap-6 items-center">
 				@forelse($mejoras as $mejora)
 					<!-- Mejora {{ $mejora->id }} -->
-					<form class="mejora-form" data-mejora-id="{{ $mejora->id }}" data-precio="{{ $mejora->precio_actual }}">
+					<form class="mejora-form w-full" data-mejora-id="{{ $mejora->id }}" data-precio="{{ $mejora->precio_actual }}">
 						@csrf
-						<x-boton
-							color="#428121"
-							text="{{ $mejora->nombre }} - {{ $mejora->es_nivel_maximo ? 'MAX. LVL' : $mejora->precio_actual . ' monedas (Nivel ' . ($mejora->nivel_actual + 1) . ')' }}"
-							size="lg"
-							height="normal"
-							border_color="#000000"
-							type="submit"
-							class="w-full whitespace-normal break-words"
-						/>
+						<button type="submit" 
+							class="bg-[#428121] hover:brightness-75 hover:scale-95 text-white font-bold py-3 px-5 rounded-lg shadow-lg uppercase tracking-wider text-lg transition-all duration-200 w-full whitespace-normal break-words border-2 border-black">
+							{{ $mejora->nombre }} - {{ $mejora->es_nivel_maximo ? 'MAX. LVL' : $mejora->precio_actual . ' monedas (Nivel ' . ($mejora->nivel_actual + 1) . ')' }}
+						</button>
 					</form>
 				@empty
 					<p class="text-white text-center">No hay mejoras disponibles</p>
