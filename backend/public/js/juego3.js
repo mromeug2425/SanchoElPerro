@@ -5,6 +5,8 @@ let tiempoRestante = 15;
 let intervaloTimer = null;
 let opcionArrastrada = null;
 let dragAndDropHabilitado = true;
+let respuestasCorrectas = 0;
+let respuestasIncorrectas = 0;
 
 // Cargar preguntas al iniciar la página
 document.addEventListener("DOMContentLoaded", function () {
@@ -69,6 +71,7 @@ function actualizarDisplayTimer() {
 function tiempoAgotado() {
     dragAndDropHabilitado = false;
     deshabilitarOpciones();
+    respuestasIncorrectas++;
     mostrarPopup(
         "¡TIEMPO AGOTADO!",
         "Se acabó el tiempo para responder esta pregunta.",
@@ -117,7 +120,7 @@ function mostrarPregunta(index) {
     resetearDropZone();
     dragAndDropHabilitado = true;
     habilitarOpciones();
-    
+
     const opciones = document.querySelectorAll('[data-opcion]');
     opciones.forEach(opcion => {
         opcion.addEventListener('dragstart', handleDragStart);
@@ -135,6 +138,7 @@ function verificarRespuesta(opcionSeleccionada) {
 
     if (pregunta.answer === opcionSeleccionada) {
         console.log("¡Respuesta correcta! ✅");
+        respuestasCorrectas++;
         mostrarPopup(
             "¡CORRECTO!",
             "¡Excelente! Has acertado la respuesta.",
@@ -142,6 +146,7 @@ function verificarRespuesta(opcionSeleccionada) {
         );
     } else {
         console.log("Respuesta incorrecta ❌");
+        respuestasIncorrectas++;
         mostrarPopup(
             "INCORRECTO",
             `La respuesta correcta era la opción ${pregunta.answer}.`,
@@ -191,11 +196,28 @@ function siguientePregunta() {
         mostrarPregunta(preguntaActual + 1);
     } else {
         console.log("Fin del juego 🎉");
-        mostrarPopup(
-            "¡JUEGO COMPLETADO!",
-            "¡Felicidades! Has respondido todas las preguntas.",
-            true
-        );
+        console.log(`Correctas: ${respuestasCorrectas}, Incorrectas: ${respuestasIncorrectas}`);
+
+        // Verificar si falló más de la mitad
+        const totalPreguntas = preguntas.length;
+        const mitad = totalPreguntas / 2;
+
+        if (respuestasIncorrectas > mitad) {
+            // Mostrar popup de fallo
+            mostrarPopup(
+                "¡NO HAS SATISFECHO A TU SOBRINA!",
+                `Has fallado más de la mitad de las preguntas (${respuestasIncorrectas} de ${totalPreguntas}).`,
+                false
+            );
+        } else {
+            // Mostrar popup de éxito
+            mostrarPopup(
+                "¡JUEGO COMPLETADO!",
+                `¡Felicidades! Has respondido correctamente ${respuestasCorrectas} de ${totalPreguntas} preguntas.`,
+                true
+            );
+        }
+
         setTimeout(() => {
             document.querySelector("#popup-resultado button").onclick =
                 function () {
@@ -224,7 +246,7 @@ function handleDragStart(e) {
         e.preventDefault();
         return;
     }
-    
+
     opcionArrastrada = e.target.dataset.opcion;
     e.target.classList.add('dragging');
     e.dataTransfer.effectAllowed = 'move';
