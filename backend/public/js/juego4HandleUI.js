@@ -1,23 +1,20 @@
-// Game state variables
 let game;
 let challenge;
 let playerNumbers = [];
 let playerOperations = [];
-let tiempoLimite = 60;
-let tiempoRestante = 60;
+let tiempoLimite = 120;
+let tiempoRestante = 120;
 let intervaloTimer = null;
 let clueUsed = false;
 let challengesCompleted = 0;
 let correctAnswers = 0;
-let totalChallenges = 5;
+let totalChallenges = 4;
 
-// Initialize game on DOM load
 document.addEventListener("DOMContentLoaded", function () {
     game = new MathChallengeGame();
     cargarInfoJuego(3);
 });
 
-// Load game information from backend
 async function cargarInfoJuego(idJuego = 3) {
     try {
         const baseUrl = window.BASE_URL || window.location.origin;
@@ -26,8 +23,8 @@ async function cargarInfoJuego(idJuego = 3) {
             throw new Error("Error al cargar la información del juego");
         }
         const data = await response.json();
-        tiempoLimite = data.tiempo || 60;
-        totalChallenges = data.cantidad_preguntas || 5;
+        tiempoLimite = data.tiempo || 120;
+        totalChallenges = data.cantidad_preguntas || 4;
         tiempoRestante = tiempoLimite;
         challengesCompleted = 0;
         correctAnswers = 0;
@@ -40,15 +37,12 @@ async function cargarInfoJuego(idJuego = 3) {
         startNewGame();
     } catch (error) {
         console.error("Error:", error);
-        startNewGame();
     }
 }
 
-// Timer functions
 function iniciarTimer() {
-    // Only start timer if not already running
     if (intervaloTimer) {
-        return; // Timer already running, don't restart
+        return;
     }
 
     tiempoRestante = tiempoLimite;
@@ -65,12 +59,10 @@ function iniciarTimer() {
             timerElement.style.color = "#3C3B4F";
         }
 
-        // Show clue button at 30 seconds
         if (tiempoRestante === 30 && !clueUsed) {
             document.getElementById("clue-btn").classList.remove("hidden");
         }
 
-        // Si se acaba el tiempo
         if (tiempoRestante <= 0) {
             clearInterval(intervaloTimer);
             intervaloTimer = null;
@@ -87,31 +79,26 @@ function actualizarDisplayTimer() {
 }
 
 function tiempoAgotado() {
-    // Time's up - all remaining challenges are failed
     const remainingChallenges = totalChallenges - challengesCompleted;
 
     alert(
-        `⏰ ¡TIEMPO AGOTADO!\n\n🎮 Game Over!\nCompleted: ${challengesCompleted}/${totalChallenges}\nCorrect: ${correctAnswers}\nFailed: ${remainingChallenges} (timeout)\n\nFinal Score: ${correctAnswers}/${totalChallenges}`
+        `¡TIEMPO AGOTADO!\n\n Game Over!\nCompleted: ${challengesCompleted}/${totalChallenges}\nCorrect: ${correctAnswers}\nFailed: ${remainingChallenges} (timeout)\n\nFinal Score: ${correctAnswers}/${totalChallenges}`
     );
 
-    // Reset game
     challengesCompleted = 0;
     correctAnswers = 0;
     intervaloTimer = null;
     setTimeout(startNewGame, 2000);
 }
 
-// Game flow functions
 function startNewGame() {
     challenge = game.generateChallenge();
     playerNumbers = [];
     playerOperations = [];
 
-    // Hide clue button for new challenge
     clueUsed = false;
     document.getElementById("clue-btn").classList.add("hidden");
 
-    // Update progress display
     document
         .getElementById("target-display")
         .querySelector("p").textContent = `Challenge ${
@@ -125,7 +112,6 @@ function startNewGame() {
 
     renderOperations(challenge.operations, challenge.decoyIndices.operations);
 
-    // Only start timer on first challenge
     if (challengesCompleted === 0) {
         iniciarTimer();
     }
@@ -133,7 +119,6 @@ function startNewGame() {
     console.log("New challenge started!");
 }
 
-// Rendering functions
 function renderNumbers(numbers, decoyIndices) {
     const container = document.getElementById("numbers-container");
     container.innerHTML = "";
@@ -166,16 +151,13 @@ function renderOperations(operations, decoyIndices) {
     });
 }
 
-// Clue system
 function useClue() {
     if (clueUsed) return;
 
     clueUsed = true;
 
-    // Clear current selection
     clearSelection();
 
-    // Block decoy numbers
     challenge.decoyIndices.numbers.forEach((index) => {
         const btn = document.getElementById("num-" + index);
         if (btn) {
@@ -187,7 +169,6 @@ function useClue() {
         }
     });
 
-    // Block decoy operations
     challenge.decoyIndices.operations.forEach((index) => {
         const btn = document.getElementById("op-" + index);
         if (btn) {
@@ -199,7 +180,6 @@ function useClue() {
         }
     });
 
-    // Disable clue button
     const clueBtn = document.getElementById("clue-btn");
     clueBtn.disabled = true;
     clueBtn.classList.remove("animate-pulse");
@@ -207,7 +187,6 @@ function useClue() {
     clueBtn.textContent = "Pista Usada";
 }
 
-// Player interaction functions
 function addNumber(num, index) {
     const btn = document.getElementById("num-" + index);
     if (btn.disabled) return;
@@ -245,7 +224,6 @@ function clearSelection() {
     playerNumbers = [];
     playerOperations = [];
 
-    // Re-enable all non-decoy number buttons
     challenge.numbers.forEach((num, index) => {
         const btn = document.getElementById("num-" + index);
         if (btn && btn.dataset.isDecoy === "false") {
@@ -254,7 +232,6 @@ function clearSelection() {
         }
     });
 
-    // Re-enable all non-decoy operation buttons
     challenge.operations.forEach((op, index) => {
         const btn = document.getElementById("op-" + index);
         if (btn && btn.dataset.isDecoy === "false") {
@@ -266,14 +243,11 @@ function clearSelection() {
     updateExpression();
 }
 
-// Validation function
 function isValidExpression(numbers, operations) {
-    // Need at least one number
     if (numbers.length === 0) {
         return { valid: false, message: "Please select at least one number!" };
     }
 
-    // Operations must always be one less than numbers (can't end with operation)
     if (operations.length >= numbers.length) {
         return {
             valid: false,
@@ -281,7 +255,6 @@ function isValidExpression(numbers, operations) {
         };
     }
 
-    // If we have operations, we need at least 2 numbers
     if (operations.length > 0 && numbers.length < 2) {
         return {
             valid: false,
@@ -289,8 +262,6 @@ function isValidExpression(numbers, operations) {
         };
     }
 
-    // Valid expression pattern: num (op num)*
-    // This means: operations.length should equal numbers.length - 1
     if (operations.length !== numbers.length - 1) {
         return {
             valid: false,
@@ -302,9 +273,7 @@ function isValidExpression(numbers, operations) {
     return { valid: true };
 }
 
-// Solution checking
 function checkSolution() {
-    // Validate expression syntax
     const validation = isValidExpression(playerNumbers, playerOperations);
     if (!validation.valid) {
         alert(validation.message);
@@ -318,51 +287,47 @@ function checkSolution() {
         challengesCompleted++;
         correctAnswers++;
 
-        // Check if player has completed all challenges
         if (challengesCompleted >= totalChallenges) {
-            // Stop timer when game is won
             if (intervaloTimer) {
                 clearInterval(intervaloTimer);
                 intervaloTimer = null;
             }
 
-            alert(
-                `🎉🏆 ¡FELICIDADES!\n\nYou completed all challenges!\nFinal Score: ${correctAnswers}/${totalChallenges} correct answers!`
-            );
+            showWinAnimation();
 
-            // Reset game
-            challengesCompleted = 0;
-            correctAnswers = 0;
-            setTimeout(startNewGame, 2000);
+            setTimeout(() => {
+                alert(
+                    `¡FELICIDADES!\n\nYou completed all challenges!\nFinal Score: ${correctAnswers}/${totalChallenges} correct answers!`
+                );
+
+                challengesCompleted = 0;
+                correctAnswers = 0;
+                setTimeout(startNewGame, 2000);
+                hideWinAnimation();
+            }, 2000);
         } else if (challengesCompleted === 2) {
-            // Trigger mini-game after 2nd challenge
             alert(
-                `🎉 Correct! Challenge ${challengesCompleted}/${totalChallenges} completed!`
+                `Correct! Challenge ${challengesCompleted}/${totalChallenges} completed!`
             );
 
-            // Start mini-game sequence
             setTimeout(startMiniGameSequence, 1000);
         } else {
             alert(
-                `🎉 Correct! Challenge ${challengesCompleted}/${totalChallenges} completed!`
+                `Correct! Challenge ${challengesCompleted}/${totalChallenges} completed!`
             );
             setTimeout(startNewGame, 1000);
         }
     } else {
-        // Wrong answer - stay on same challenge, just clear selection
         alert(
-            "❌ Wrong! Try again. (Target: " +
+            "Wrong! Try again. (Target: " +
                 challenge.target +
                 ", You got: " +
                 result +
                 ")"
         );
 
-        // Clear selection but DON'T start new game
         playerNumbers = [];
         playerOperations = [];
         clearSelection();
-
-        // Timer keeps running, don't restart it
     }
 }

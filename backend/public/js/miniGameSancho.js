@@ -1,41 +1,34 @@
-// Mini-Game: Sancho's Special Attack
 class MiniGameSancho {
     constructor(canvasId) {
         this.canvas = document.getElementById(canvasId);
         this.ctx = this.canvas.getContext("2d");
 
-        // Game state
         this.isRunning = false;
         this.gameLoopId = null;
         this.timeRemaining = 20;
         this.timeEarned = 0;
         this.lastSpawnTime = 0;
-        this.spawnInterval = 800; // milliseconds
+        this.spawnInterval = 800;
         this.lastShotTime = 0;
-        this.shotCooldown = 300; // milliseconds
+        this.shotCooldown = 400;
 
-        // Player
         this.player = {
             x: this.canvas.width / 2 - 25,
             y: this.canvas.height - 70,
             width: 50,
             height: 50,
-            color: "#3B82F6", // blue
+            color: "#3B82F6",
         };
 
-        // Mouse position
         this.mouseX = this.canvas.width / 2;
         this.mouseY = 0;
 
-        // Game objects
         this.bullets = [];
         this.enemies = [];
-        this.floatingTexts = []; // For showing +/-time on hits
+        this.floatingTexts = [];
 
-        // Callbacks
         this.onGameEnd = null;
 
-        // Load images
         this.images = {
             redEnemies: [new Image(), new Image(), new Image()],
             greenEnemy: new Image(),
@@ -52,7 +45,6 @@ class MiniGameSancho {
         this.images.bullet.src = "/img/personajes/player/shovel.png";
         this.imagesLoaded = false;
 
-        // Wait for images to load
         Promise.all([
             new Promise(
                 (resolve) => (this.images.redEnemies[0].onload = resolve)
@@ -70,21 +62,17 @@ class MiniGameSancho {
             this.imagesLoaded = true;
         });
 
-        // Bind event handlers
         this.handleMouseMove = this.handleMouseMove.bind(this);
         this.handleKeyDown = this.handleKeyDown.bind(this);
     }
 
     init() {
-        // Setup canvas
         this.canvas.width = 800;
         this.canvas.height = 600;
 
-        // Update player position based on canvas size
         this.player.x = this.canvas.width / 2 - this.player.width / 2;
         this.player.y = this.canvas.height - this.player.height - 20;
 
-        // Add event listeners
         this.canvas.addEventListener("mousemove", this.handleMouseMove);
         document.addEventListener("keydown", this.handleKeyDown);
     }
@@ -98,10 +86,8 @@ class MiniGameSancho {
         this.enemies = [];
         this.lastSpawnTime = Date.now();
 
-        // Start game timer
         this.startTimer();
 
-        // Start game loop
         this.gameLoop();
     }
 
@@ -119,21 +105,17 @@ class MiniGameSancho {
     stop() {
         this.isRunning = false;
 
-        // Clear intervals
         if (this.timerInterval) {
             clearInterval(this.timerInterval);
         }
 
-        // Cancel animation frame
         if (this.gameLoopId) {
             cancelAnimationFrame(this.gameLoopId);
         }
 
-        // Remove event listeners
         this.canvas.removeEventListener("mousemove", this.handleMouseMove);
         document.removeEventListener("keydown", this.handleKeyDown);
 
-        // Call end callback
         if (this.onGameEnd) {
             this.onGameEnd(this.timeEarned);
         }
@@ -142,23 +124,18 @@ class MiniGameSancho {
     gameLoop() {
         if (!this.isRunning) return;
 
-        // Clear canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // Spawn enemies
         this.spawnEnemies();
 
-        // Update
         this.updateBullets();
         this.updateEnemies();
         this.updateFloatingTexts();
         this.checkCollisions();
         this.cleanup();
 
-        // Render
         this.render();
 
-        // Continue loop
         this.gameLoopId = requestAnimationFrame(() => this.gameLoop());
     }
 
@@ -181,7 +158,6 @@ class MiniGameSancho {
 
         this.lastShotTime = now;
 
-        // Calculate direction from player to mouse
         const playerCenterX = this.player.x + this.player.width / 2;
         const playerCenterY = this.player.y + this.player.height / 2;
 
@@ -189,11 +165,9 @@ class MiniGameSancho {
         const dy = this.mouseY - playerCenterY;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        // Normalize direction
         const velocityX = (dx / distance) * 8;
         const velocityY = (dy / distance) * 8;
 
-        // Calculate rotation angle (in radians)
         const angle = Math.atan2(dy, dx);
 
         this.bullets.push({
@@ -204,7 +178,7 @@ class MiniGameSancho {
             velocityX: velocityX,
             velocityY: velocityY,
             angle: angle,
-            color: "#60A5FA", // light blue
+            color: "#60A5FA",
             image: this.images.bullet,
         });
     }
@@ -212,14 +186,12 @@ class MiniGameSancho {
     spawnEnemies() {
         const now = Date.now();
         if (now - this.lastSpawnTime < this.spawnInterval) return;
-        if (this.enemies.length >= 12) return; // Max enemies on screen
+        if (this.enemies.length >= 12) return;
 
         this.lastSpawnTime = now;
 
-        // 70% chance for red (good), 30% for green (bad)
         const isRed = Math.random() < 0.7;
 
-        // If red, randomly select one of the three camel variants
         let enemyImage;
         if (isRed) {
             const randomIndex = Math.floor(Math.random() * 3);
@@ -237,7 +209,7 @@ class MiniGameSancho {
             type: isRed ? "red" : "green",
             color: isRed ? "#EF4444" : "#22C55E",
             image: enemyImage,
-            timeValue: Math.floor(Math.random() * 5) + 2, // 2-6 seconds
+            timeValue: Math.floor(Math.random() * 5) + 2,
         };
 
         this.enemies.push(enemy);
@@ -247,8 +219,7 @@ class MiniGameSancho {
         this.bullets.forEach((bullet) => {
             bullet.x += bullet.velocityX;
             bullet.y += bullet.velocityY;
-            // Rotate the shovel as it travels
-            bullet.angle += 0.2; // Rotation speed
+            bullet.angle += 0.2;
         });
     }
 
@@ -259,17 +230,15 @@ class MiniGameSancho {
     }
 
     updateFloatingTexts() {
-        // Update floating texts and remove expired ones
         this.floatingTexts = this.floatingTexts.filter((text) => {
-            text.y -= 1; // Move up
+            text.y -= 1;
             text.lifetime--;
-            text.alpha = text.lifetime / 60; // Fade out
+            text.alpha = text.lifetime / 60;
             return text.lifetime > 0;
         });
     }
 
     checkCollisions() {
-        // Check each bullet against each enemy
         for (let i = this.bullets.length - 1; i >= 0; i--) {
             const bullet = this.bullets[i];
             let bulletHit = false;
@@ -277,19 +246,15 @@ class MiniGameSancho {
             for (let j = this.enemies.length - 1; j >= 0; j--) {
                 const enemy = this.enemies[j];
 
-                // AABB collision detection
                 if (this.rectanglesCollide(bullet, enemy)) {
-                    // Hit!
                     bulletHit = true;
 
-                    // Apply time effect
                     if (enemy.type === "red") {
                         this.timeEarned += enemy.timeValue;
                     } else {
                         this.timeEarned -= enemy.timeValue;
                     }
 
-                    // Create floating text at enemy position
                     this.floatingTexts.push({
                         x: enemy.x + enemy.width / 2,
                         y: enemy.y + enemy.height / 2,
@@ -299,20 +264,17 @@ class MiniGameSancho {
                                 : `-${enemy.timeValue}s`,
                         color: enemy.type === "red" ? "#22C55E" : "#EF4444",
                         alpha: 1.0,
-                        lifetime: 60, // frames
+                        lifetime: 60,
                     });
 
-                    // Update score display
                     this.updateScoreDisplay();
 
-                    // Remove enemy
                     this.enemies.splice(j, 1);
 
-                    break; // Bullet only hits one enemy
+                    break;
                 }
             }
 
-            // Remove bullet if it hit something
             if (bulletHit) {
                 this.bullets.splice(i, 1);
             }
@@ -329,7 +291,6 @@ class MiniGameSancho {
     }
 
     cleanup() {
-        // Remove off-screen bullets
         this.bullets = this.bullets.filter((bullet) => {
             return (
                 bullet.x > -20 &&
@@ -339,14 +300,12 @@ class MiniGameSancho {
             );
         });
 
-        // Remove enemies that reached bottom
         this.enemies = this.enemies.filter((enemy) => {
             return enemy.y < this.canvas.height;
         });
     }
 
     render() {
-        // Draw player
         if (this.imagesLoaded && this.images.player) {
             this.ctx.drawImage(
                 this.images.player,
@@ -356,7 +315,6 @@ class MiniGameSancho {
                 this.player.height
             );
         } else {
-            // Fallback to colored square if image not loaded
             this.ctx.fillStyle = this.player.color;
             this.ctx.fillRect(
                 this.player.x,
@@ -366,7 +324,6 @@ class MiniGameSancho {
             );
         }
 
-        // Draw aim line
         this.ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
         this.ctx.lineWidth = 2;
         this.ctx.beginPath();
@@ -376,7 +333,6 @@ class MiniGameSancho {
         this.ctx.lineTo(this.mouseX, this.mouseY);
         this.ctx.stroke();
 
-        // Draw bullets
         this.bullets.forEach((bullet) => {
             if (this.imagesLoaded && bullet.image) {
                 this.ctx.save();
@@ -394,7 +350,6 @@ class MiniGameSancho {
                 );
                 this.ctx.restore();
             } else {
-                // Fallback to colored square if image not loaded
                 this.ctx.fillStyle = bullet.color;
                 this.ctx.fillRect(
                     bullet.x,
@@ -405,7 +360,6 @@ class MiniGameSancho {
             }
         });
 
-        // Draw enemies
         this.enemies.forEach((enemy) => {
             if (this.imagesLoaded && enemy.image) {
                 this.ctx.drawImage(
@@ -416,13 +370,11 @@ class MiniGameSancho {
                     enemy.height
                 );
             } else {
-                // Fallback to colored squares if images not loaded
                 this.ctx.fillStyle = enemy.color;
                 this.ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
             }
         });
 
-        // Draw floating texts
         this.ctx.font = "bold 24px Arial";
         this.ctx.textAlign = "center";
         this.floatingTexts.forEach((text) => {
@@ -433,7 +385,7 @@ class MiniGameSancho {
             this.ctx.strokeText(text.text, text.x, text.y);
             this.ctx.fillText(text.text, text.x, text.y);
         });
-        this.ctx.globalAlpha = 1.0; // Reset alpha
+        this.ctx.globalAlpha = 1.0;
     }
 
     updateTimerDisplay() {

@@ -21,28 +21,6 @@
 				</form>
 			</div>
 
-			<!-- Animated Character -->
-			<div class="absolute left-8 bottom-32 z-20">
-				<img id="character-sprite" src="{{ asset('img/personajes/black/down.png') }}" alt="Character" class="w-32 h-32 object-contain">
-			</div>
-
-			<script>
-				// Alternate character sprite every 0.5 seconds
-				(function() {
-					const sprite = document.getElementById('character-sprite');
-					const images = [
-						'{{ asset('img/personajes/black/down.png') }}',
-						'{{ asset('img/personajes/black/up.png') }}'
-					];
-					let currentIndex = 0;
-					
-					setInterval(function() {
-						currentIndex = (currentIndex + 1) % 2;
-						sprite.src = images[currentIndex];
-					}, 300);
-				})();
-			</script>
-
 			<!-- Botones de Tienda y Juegos a la derecha (cuando está autenticado) -->
 			<div class="absolute right-8 bottom-32 z-20 flex flex-col gap-6">
 				<!-- Botón TIENDA -->

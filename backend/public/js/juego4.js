@@ -21,7 +21,6 @@ class MathChallengeGame {
     }
 
     shuffleArray(array) {
-        // Fisher-Yates shuffle
         const shuffled = [...array];
         for (let i = shuffled.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -58,7 +57,6 @@ class MathChallengeGame {
         while (attempts < this.maxAttempts) {
             attempts++;
 
-            // Generate 4 numbers and 3 operations
             const numbers = [];
             for (let i = 0; i < 4; i++) {
                 numbers.push(this.getRandomInt(1, 12));
@@ -70,7 +68,6 @@ class MathChallengeGame {
                 operations.push(ops[this.getRandomInt(0, ops.length - 1)]);
             }
 
-            // Check for division by zero
             let hasDivisionByZero = false;
             for (let i = 0; i < operations.length; i++) {
                 if (operations[i] === "/" && numbers[i + 1] === 0) {
@@ -81,10 +78,7 @@ class MathChallengeGame {
 
             if (hasDivisionByZero) continue;
 
-            // Evaluate the expression
             const result = this.evaluateExpression(numbers, operations);
-
-            // Check if result is an integer and within bounds (-200 to 200)
             if (
                 result !== null &&
                 this.isInteger(result) &&
@@ -99,8 +93,6 @@ class MathChallengeGame {
             }
         }
 
-        // Fallback: use only addition and subtraction if max attempts reached
-        console.log("Using fallback generation (no division/multiplication)");
         let fallbackAttempts = 0;
 
         while (fallbackAttempts < 20) {
@@ -108,7 +100,7 @@ class MathChallengeGame {
 
             const numbers = [];
             for (let i = 0; i < 4; i++) {
-                numbers.push(this.getRandomInt(1, 50));
+                numbers.push(this.getRandomInt(1, 12));
             }
 
             const operations = [];
@@ -121,8 +113,12 @@ class MathChallengeGame {
 
             const result = this.evaluateExpression(numbers, operations);
 
-            // Check if fallback result is also within bounds
-            if (result !== null && result >= -200 && result <= 200) {
+            if (
+                result !== null &&
+                this.isInteger(result) &&
+                result >= -200 &&
+                result <= 200
+            ) {
                 return {
                     numbers: numbers,
                     operations: operations,
@@ -131,8 +127,7 @@ class MathChallengeGame {
             }
         }
 
-        // Ultimate fallback: simple addition
-        const numbers = [10, 20, 30, 40];
+        const numbers = [1, 2, 3, 4];
         const operations = ["+", "+", "+"];
         const result = this.evaluateExpression(numbers, operations);
 
@@ -143,14 +138,12 @@ class MathChallengeGame {
         };
     }
 
-    generateDecoys(existingNumbers, existingOperations) {
-        // Generate 2 decoy numbers
+    generateDecoys() {
         const decoyNumbers = [];
         for (let i = 0; i < 2; i++) {
             decoyNumbers.push(this.getRandomInt(1, 12));
         }
 
-        // Generate 1 decoy operation
         const ops = ["+", "-", "*", "/"];
         const decoyOperation = ops[this.getRandomInt(0, ops.length - 1)];
 
@@ -161,21 +154,14 @@ class MathChallengeGame {
     }
 
     generateChallenge() {
-        // Step 1: Generate valid expression with integer result
         const expression = this.generateValidExpression();
 
-        // Store the correct solution
         this.correctNumbers = [...expression.numbers];
         this.correctOperations = [...expression.operations];
         this.targetNumber = expression.target;
 
-        // Step 2: Generate decoys
-        const decoys = this.generateDecoys(
-            expression.numbers,
-            expression.operations
-        );
+        const decoys = this.generateDecoys();
 
-        // Step 3: Combine and track indices before shuffling
         const numbersWithIndices = expression.numbers.map((num, idx) => ({
             value: num,
             originalIdx: idx,
@@ -206,11 +192,9 @@ class MathChallengeGame {
             decoyOperationWithIndex,
         ];
 
-        // Step 4: Shuffle
         const shuffledNumbers = this.shuffleArray(allNumbersWithIndices);
         const shuffledOperations = this.shuffleArray(allOperationsWithIndices);
 
-        // Step 5: Extract values and decoy indices
         this.allNumbers = shuffledNumbers.map((item) => item.value);
         this.allOperations = shuffledOperations.map((item) => item.value);
 
