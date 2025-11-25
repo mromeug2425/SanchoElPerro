@@ -45,19 +45,34 @@ class LoginController extends Controller
 				->get();
 
 			foreach ($openSessions as $openSession) {
-				$createdAt = Carbon::parse($openSession->createdAt);
-				$now = Carbon::now();
-				$durationSeconds = $now->diffInSeconds($createdAt);
-				
-				// Convert seconds to TIME format (HH:MM:SS)
-				$hours = floor($durationSeconds / 3600);
-				$minutes = floor(($durationSeconds % 3600) / 60);
-				$seconds = $durationSeconds % 60;
-				$durationTime = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
-				
-				// Update the session with calculated duration
-				$openSession->duracion = $durationTime;
-				$openSession->save();
+
+			if (!$openSession->createdAt) {
+				continue;
+			} 
+			
+				try {
+					$createdAt = Carbon::parse($openSession->createdAt);
+					$now = Carbon::now();
+					$durationSeconds = $now->diffInSeconds($createdAt);
+
+					if ($durationSeconds < 0) {
+						$durationSeconds = 0;
+					}
+
+					// Convert seconds to TIME format (HH:MM:SS)
+					$hours = floor($durationSeconds / 3600);
+					$minutes = floor(($durationSeconds % 3600) / 60);
+					$seconds = $durationSeconds % 60;
+					$durationTime = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+					
+					// Update the session with calculated duration
+					$openSession->duracion = $durationTime;
+					$openSession->save();
+					
+				} catch (\Exception $e) {
+					Log::error('Error calculando duración de sesión: ' . $e->getMessage());
+					continue;
+				}
 			}
 		}
 

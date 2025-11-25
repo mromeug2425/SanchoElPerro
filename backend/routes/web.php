@@ -30,3 +30,6 @@ Route::post('/register', [RegisterController::class, 'register']);
 
 // Preguntas
 Route::get('preguntas/{id_juego?}', [PreguntasController::class, 'preguntasMostradas']);
+
+// Compra de mejoras
+Route::post('/mejoras/comprar', [MejorasController::class, 'comprar'])->name('mejoras.comprar')->middleware('auth');
