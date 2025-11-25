@@ -1,10 +1,19 @@
 // Variable global para compartir entre archivos
 window.sesionJuegoId = null;
+window.sesionJuegoReady = null;
 
-// Al cargar la página del juego
-window.addEventListener('load', function () {
-    iniciarSesionJuego();
-});
+function ensureSesionJuego() {
+    if (!window.sesionJuegoReady) {
+        window.sesionJuegoReady = iniciarSesionJuego();
+    }
+    return window.sesionJuegoReady;
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', ensureSesionJuego);
+} else {
+    ensureSesionJuego();
+}
 
 // Función para iniciar la sesión de juego
 function iniciarSesionJuego() {
@@ -16,17 +25,27 @@ function iniciarSesionJuego() {
         return;
     }
 
-    fetch('/sesion-juego/iniciar', {
+    return fetch('/sesion-juego/iniciar', {
         method: 'POST',
+        // credentials: 'same-origin',
         headers: {
             'Content-Type': 'application/json',
+            //'Accept': 'application/json',
+            //'X-Requested-With': 'XMLHttpRequest',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
         },
         body: JSON.stringify({
             id_juego: parseInt(idJuego)
         })
     })
-        .then(response => response.json())
+        .then(async response => {
+            if (!response.ok) {
+                const text = await response.text();
+                console.error('Error al iniciar sesión (HTTP ' + response.status + '):', text);
+                throw new Error('HTTP ' + response.status);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 window.sesionJuegoId = data.sesion_juego_id;
@@ -47,8 +66,11 @@ function finalizarSesionJuego(monedasGanadas = 0, monedasGastadas = 0, ganado = 
 
     return fetch('/sesion-juego/finalizar', {
         method: 'POST',
+        credentials: 'same-origin',
         headers: {
             'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
         },
         body: JSON.stringify({
@@ -58,7 +80,14 @@ function finalizarSesionJuego(monedasGanadas = 0, monedasGastadas = 0, ganado = 
             ganado: ganado
         })
     })
-        .then(response => response.json())
+        .then(async response => {
+            if (!response.ok) {
+                const text = await response.text();
+                console.error('Error al finalizar sesión (HTTP ' + response.status + '):', text);
+                throw new Error('HTTP ' + response.status);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 console.log('Sesión de juego finalizada. Duración:', data.duracion, 'segundos');

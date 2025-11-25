@@ -13,11 +13,11 @@ class SesionesJuegosPreguntas extends Model
     public $timestamps = false;
 
     public function preguntas(){
-        return $this->hasOne(Preguntas::class, 'id_pregunta');
+        return $this->belongsTo(Preguntas::class, 'id_pregunta', 'id');
     }
 
     public function sesionesJuegos() {
-        return $this->belongsTo(SesionesJuegos::class, 'id_sesion_juego');
+        return $this->belongsTo(SesionesJuegos::class, 'id_sesion_juegos');
     }
 
     protected $fillable = [

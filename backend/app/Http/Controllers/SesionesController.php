@@ -24,16 +24,20 @@ class SesionesController extends Controller
         
         // 3. Validar que exista una sesión activa
         if (!$sesionActiva) {
-            return response()->json(['error' => 'No hay sesión activa'], 400);
+            $sesionActiva = Sesiones::create([
+                'id_usuario' => $usuario->id,
+                'duracion' => null,
+                'monedas_gastadas' => 0,
+                'createdAt' => Carbon::now(),
+            ]);
         }
-        
         // 4. Crear el registro en sesiones_juegos
         $sesionJuego = SesionesJuegos::create([
             'id_juego' => $request->id_juego, // Recibido desde el frontend
             'id_sesion' => $sesionActiva->id,
             'duracion' => null, // Se calculará al finalizar
             'monedas_ganadas' => 0,
-            'monedas_gastadas' => 0,
+            'monedas_perdidas' => 0,
             'ganado' => false,
             'createdAt' => Carbon::now()
         ]);
@@ -72,7 +76,7 @@ class SesionesController extends Controller
     }
     
     public function guardarRespuesta(Request $request){
-     
+
         // 1. Validar que exista la sesión de juego
     $sesionJuego = SesionesJuegos::find($request->id_sesion_juegos);
     

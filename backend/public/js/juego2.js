@@ -182,8 +182,10 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-function guardarRespuestaEnBD(pregunta, respuestaUsuario, acertada) {
-    // Obtener el sesionJuegoId desde sesiones.js (variable global)
+async function guardarRespuestaEnBD(pregunta, respuestaUsuario, acertada) {
+    if (!window.sesionJuegoId && window.sesionJuegoReady) {
+        try { await window.sesionJuegoReady; } catch (e) {}
+    }
     if (!window.sesionJuegoId) {
         console.error('No hay sesión de juego activa');
         return;
@@ -200,8 +202,11 @@ function guardarRespuestaEnBD(pregunta, respuestaUsuario, acertada) {
     // Enviar al backend
     fetch('/sesion-juego/guardar-respuesta', {
         method: 'POST',
+        credentials: 'same-origin',
         headers: {
             'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
         },
         body: JSON.stringify({
@@ -213,7 +218,14 @@ function guardarRespuestaEnBD(pregunta, respuestaUsuario, acertada) {
             opciones: opciones
         })
     })
-        .then(response => response.json())
+        .then(async response => {
+            if (!response.ok) {
+                const text = await response.text();
+                console.error('Error al guardar respuesta (HTTP ' + response.status + '):', text);
+                throw new Error('HTTP ' + response.status);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 console.log('✅ Respuesta guardada en BD:', data.respuesta_id);
