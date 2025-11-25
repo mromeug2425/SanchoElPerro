@@ -4,10 +4,10 @@ let preguntaActual = 0;
 let tiempoLimite = 15;
 let tiempoRestante = 15;
 let intervaloTimer = null;
-let respuestaEsCorrecto = false; 
+let respuestaEsCorrecto = false;
 
 //  Posiciones de los personajes al empezar
-let posicionJugador = 3; 
+let posicionJugador = 3;
 let posicionCamello = 0;
 
 //  FUNCIONES DE PREGUNTAS 
@@ -15,22 +15,22 @@ function cargarPreguntas(idJuego) {
     const baseUrl = window.BASE_URL || window.location.origin;
     console.log("Cargando preguntas desde:", baseUrl + "/preguntas/" + idJuego);
     fetch(baseUrl + "/preguntas/" + idJuego)
-        .then(function(response) {
+        .then(function (response) {
             return response.json();
         })
-        .then(function(data) {
+        .then(function (data) {
             console.log("Preguntas cargadas:", data);
             preguntas = data.preguntas || data;
             tiempoLimite = data.tiempo || 15;
 
             if (preguntas.length > 0) {
-                
+
                 console.log(preguntas);
                 medirImagenFondo();
                 mostrarPregunta(0);
             }
         })
-        .catch(function(error) {
+        .catch(function (error) {
             console.error("Error al cargar preguntas:", error);
         });
 }
@@ -43,7 +43,7 @@ function iniciarTimer() {
     tiempoRestante = tiempoLimite;
     actualizarDisplayTimer();
 
-    intervaloTimer = setInterval(function() {
+    intervaloTimer = setInterval(function () {
         tiempoRestante--;
         actualizarDisplayTimer();
 
@@ -132,10 +132,12 @@ function verificarRespuesta(opcionSeleccionada) {
         console.log("¡Respuesta correcta! ✅");
         mostrarPopup("¡CORRECTO!", "¡Excelente! Has acertado <[:{V", true);
         respuestaEsCorrecto = true;
+        guardarRespuestaEnBD(pregunta, opcionSeleccionada, true);
     } else {
         console.log("Respuesta incorrecta ❌");
         mostrarPopup("INCORRECTO", "La respuesta correcta era la opción " + pregunta.answer + ".", false);
         respuestaEsCorrecto = false;
+        guardarRespuestaEnBD(pregunta, opcionSeleccionada, false);
     }
 }
 
@@ -144,9 +146,16 @@ function siguientePregunta() {
         mostrarPregunta(preguntaActual + 1);
     } else {
         console.log("Fin del juego");
+
+        // Calcular resultados para finalizar sesión
+        // En este juego simple no estamos trackeando monedas ganadas/gastadas por ahora
+        // pero podríamos añadirlo si fuera necesario.
+        // Asumimos ganado si se completan todas las preguntas (o podríamos poner un umbral)
+        finalizarSesionJuego(0, 0, true);
+
         mostrarPopup("¡JUEGO COMPLETADO!", "¡Felicidades! Has respondido todas las preguntas.", true);
-        setTimeout(function() {
-            document.querySelector("#popup-resultado button").onclick = function() {
+        setTimeout(function () {
+            document.querySelector("#popup-resultado button").onclick = function () {
                 window.location.href = "/";
             };
         }, 100);
@@ -164,11 +173,53 @@ function reiniciarJuego() {
 }
 
 // Inicializar cuando carga la página
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     cargarPreguntas(2);
-    
+
     // Event listener para las teclas de flechas en QTE
-    document.addEventListener("keydown", function(event) {
+    document.addEventListener("keydown", function (event) {
         procesarTeclaBTE(event);
     });
 });
+
+function guardarRespuestaEnBD(pregunta, respuestaUsuario, acertada) {
+    // Obtener el sesionJuegoId desde sesiones.js (variable global)
+    if (!window.sesionJuegoId) {
+        console.error('No hay sesión de juego activa');
+        return;
+    }
+
+    // Preparar las opciones como un objeto
+    const opciones = {
+        opcion_1: pregunta.opcion_1,
+        opcion_2: pregunta.opcion_2,
+        opcion_3: pregunta.opcion_3,
+        opcion_4: pregunta.opcion_4
+    };
+
+    // Enviar al backend
+    fetch('/sesion-juego/guardar-respuesta', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({
+            id_sesion_juegos: window.sesionJuegoId,
+            id_pregunta: pregunta.id,
+            acertada: acertada,
+            respuesta_usuario: respuestaUsuario,
+            respuesta_correcta: pregunta.answer,
+            opciones: opciones
+        })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('✅ Respuesta guardada en BD:', data.respuesta_id);
+            } else {
+                console.error('❌ Error al guardar respuesta:', data.error);
+            }
+        })
+        .catch(error => console.error('❌ Error en la petición:', error));
+}

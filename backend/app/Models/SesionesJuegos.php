@@ -21,7 +21,17 @@ class SesionesJuegos extends Model
     }
 
     public function sesiones(){
-        return $this->belongsTo(Sesiones::class, 'id');
+        return $this->belongsTo(Sesiones::class, 'id_sesion');
     }
 
+    protected $fillable = [
+        'id',
+        'id_juego',
+        'id_sesion',
+        'duracion',
+        'monedas_ganadas',
+        'monedas_perdidas',
+        'ganado',
+        'createdAt'
+    ];
 }

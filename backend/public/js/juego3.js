@@ -72,6 +72,11 @@ function tiempoAgotado() {
     dragAndDropHabilitado = false;
     deshabilitarOpciones();
     respuestasIncorrectas++;
+
+    // NUEVO: Guardar como respuesta incorrecta (sin respuesta del usuario)
+    const pregunta = preguntas[preguntaActual];
+    guardarRespuestaEnBD(pregunta, null, false);  // null = no respondió
+
     mostrarPopup(
         "¡TIEMPO AGOTADO!",
         "Se acabó el tiempo para responder esta pregunta.",
@@ -135,8 +140,12 @@ function verificarRespuesta(opcionSeleccionada) {
     deshabilitarOpciones();
 
     const pregunta = preguntas[preguntaActual];
+    const esCorrecta = pregunta.answer === opcionSeleccionada;
 
-    if (pregunta.answer === opcionSeleccionada) {
+    // NUEVO: Guardar la respuesta en la base de datos
+    guardarRespuestaEnBD(pregunta, opcionSeleccionada, esCorrecta);
+
+    if (esCorrecta) {
         console.log("¡Respuesta correcta! ✅");
         respuestasCorrectas++;
         mostrarPopup(
@@ -154,6 +163,7 @@ function verificarRespuesta(opcionSeleccionada) {
         );
     }
 }
+
 
 function mostrarPopup(titulo, mensaje, esCorrecto) {
     const popup = document.getElementById("popup-resultado");
@@ -335,4 +345,46 @@ function resetearDropZone() {
     dropZone.addEventListener('dragenter', handleDragOver, false);
     dropZone.addEventListener('dragleave', handleDragLeave, false);
     dropZone.addEventListener('drop', handleDrop, false);
+}
+
+function guardarRespuestaEnBD(pregunta, respuestaUsuario, acertada) {
+    // Obtener el sesionJuegoId desde sesiones.js (variable global)
+    if (!window.sesionJuegoId) {
+        console.error('No hay sesión de juego activa');
+        return;
+    }
+
+    // Preparar las opciones como un objeto
+    const opciones = {
+        opcion_1: pregunta.opcion_1,
+        opcion_2: pregunta.opcion_2,
+        opcion_3: pregunta.opcion_3,
+        opcion_4: pregunta.opcion_4
+    };
+
+    // Enviar al backend
+    fetch('/sesion-juego/guardar-respuesta', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({
+            id_sesion_juegos: window.sesionJuegoId,
+            id_pregunta: pregunta.id,
+            acertada: acertada,
+            respuesta_usuario: respuestaUsuario,
+            respuesta_correcta: pregunta.answer,
+            opciones: opciones
+        })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('✅ Respuesta guardada en BD:', data.respuesta_id);
+            } else {
+                console.error('❌ Error al guardar respuesta:', data.error);
+            }
+        })
+        .catch(error => console.error('❌ Error en la petición:', error));
 }

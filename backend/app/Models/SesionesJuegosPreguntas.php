@@ -19,4 +19,19 @@ class SesionesJuegosPreguntas extends Model
     public function sesionesJuegos() {
         return $this->belongsTo(SesionesJuegos::class, 'id_sesion_juego');
     }
+
+    protected $fillable = [
+        'id',
+    'id_sesion_juegos',
+    'id_pregunta',
+    'acertada',
+    'respuesta_usuario',
+    'respuesta_correcta',
+    'opciones' 
+    ];
+
+    protected $casts = [
+    'acertada' => 'boolean',
+    'opciones' => 'array'  // Convierte automáticamente entre JSON y array
+];
 }
