@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Sesiones;
-use App\Models\SesionesJuegos;
-use App\Models\SesionesJuegosPreguntas;
-use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Models\Sesiones;
+use Illuminate\Http\Request;
+use App\Models\SesionesJuegos;
+use Illuminate\Support\Facades\Log;
+use App\Models\SesionesJuegosPreguntas;
 
 class SesionesController extends Controller
 {
@@ -15,6 +16,8 @@ class SesionesController extends Controller
     {
         // 1. Obtener el usuario autenticado
         $usuario = auth()->user();
+
+        Log::info('Iniciando sesión de juego para el usuario ID: ' . $usuario);
         
         // 2. Obtener la sesión activa del usuario
         $sesionActiva = Sesiones::where('id_usuario', $usuario->id)
@@ -63,9 +66,9 @@ class SesionesController extends Controller
         
         // 3. Actualizar los campos
         $sesionJuego->update([
-            'duracion' => $duracion,
+            'duracion' => gmdate('H:i:s', $inicio->diffInSeconds(Carbon::now())),
             'monedas_ganadas' => $request->monedas_ganadas ?? 0,
-            'monedas_gastadas' => $request->monedas_gastadas ?? 0,
+            'monedas_perdidas' => $request->monedas_perdidas ?? 0,
             'ganado' => $request->ganado ?? false
         ]);
         
@@ -78,26 +81,26 @@ class SesionesController extends Controller
     public function guardarRespuesta(Request $request){
 
         // 1. Validar que exista la sesión de juego
-    $sesionJuego = SesionesJuegos::find($request->id_sesion_juegos);
-    
-    if (!$sesionJuego) {
-        return response()->json(['error' => 'Sesión de juego no encontrada'], 404);
-    }
-    
-    // 2. Crear el registro de la respuesta
-    $respuesta = SesionesJuegosPreguntas::create([
-        'id_sesion_juegos' => $request->id_sesion_juegos,
-        'id_pregunta' => $request->id_pregunta,
-        'acertada' => $request->acertada,
-        'respuesta_usuario' => $request->respuesta_usuario,
-        'respuesta_correcta' => $request->respuesta_correcta,
-        'opciones' => $request->opciones  // Array con las 4 opciones
-    ]);
-    
-    return response()->json([
-        'success' => true,
-        'respuesta_id' => $respuesta->id
-    ]);
+        $sesionJuego = SesionesJuegos::find($request->id_sesion_juegos);
+        
+        if (!$sesionJuego) {
+            return response()->json(['error' => 'Sesión de juego no encontrada'], 404);
+        }
+        
+        // 2. Crear el registro de la respuesta
+            $respuesta = SesionesJuegosPreguntas::create([
+                'id_sesion_juegos' => $request->id_sesion_juegos,
+                'id_pregunta' => $request->id_pregunta,
+                'acertada' => $request->acertada,
+                'respuesta_usuario' => strval($request->respuesta_usuario),
+                'respuesta_correcta' => strval($request->respuesta_correcta),
+                'opciones' => json_encode($request->opciones), // Convierte el array a JSON
+            ]);
+        
+        return response()->json([
+            'success' => true,
+            'respuesta_id' => $respuesta->id
+        ]);
     
     }
 

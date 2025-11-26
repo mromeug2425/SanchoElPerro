@@ -2,21 +2,21 @@
 window.sesionJuegoId = null;
 window.sesionJuegoReady = null;
 
-function ensureSesionJuego() {
+async function ensureSesionJuego() {
     if (!window.sesionJuegoReady) {
-        window.sesionJuegoReady = iniciarSesionJuego();
+        window.sesionJuegoReady = await iniciarSesionJuego();
     }
     return window.sesionJuegoReady;
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', ensureSesionJuego);
-} else {
-    ensureSesionJuego();
-}
+//if (document.readyState === 'loading') {
+//    document.addEventListener('DOMContentLoaded', ensureSesionJuego);
+//} else {
+//    ensureSesionJuego();
+//}
 
 // Función para iniciar la sesión de juego
-function iniciarSesionJuego() {
+async function iniciarSesionJuego() {
     // Obtener el id_juego desde el atributo data-id-juego del body o cualquier elemento
     const idJuego = document.body.getAttribute('data-id-juego') || document.querySelector('[data-id-juego]')?.getAttribute('data-id-juego');
 
@@ -25,7 +25,7 @@ function iniciarSesionJuego() {
         return;
     }
 
-    return fetch('/sesion-juego/iniciar', {
+    return await fetch('/sesion-juego/iniciar', {
         method: 'POST',
         // credentials: 'same-origin',
         headers: {
@@ -39,7 +39,9 @@ function iniciarSesionJuego() {
         })
     })
         .then(async response => {
+            console.log('Respuesta recibida al iniciar sesión:', response);
             if (!response.ok) {
+                console.log('Respuesta no exitosa:', response);
                 const text = await response.text();
                 console.error('Error al iniciar sesión (HTTP ' + response.status + '):', text);
                 throw new Error('HTTP ' + response.status);
@@ -58,13 +60,13 @@ function iniciarSesionJuego() {
 }
 
 // Función para finalizar la sesión de juego
-function finalizarSesionJuego(monedasGanadas = 0, monedasGastadas = 0, ganado = false) {
+async function finalizarSesionJuego(monedasGanadas = 0, monedasGastadas = 0, ganado = false) {
     if (!window.sesionJuegoId) {
         console.error('No hay sesión de juego activa');
         return Promise.reject('No hay sesión activa');
     }
 
-    return fetch('/sesion-juego/finalizar', {
+    return await fetch('/sesion-juego/finalizar', {
         method: 'POST',
         credentials: 'same-origin',
         headers: {

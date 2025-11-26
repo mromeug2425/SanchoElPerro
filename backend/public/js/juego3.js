@@ -204,7 +204,7 @@ function cerrarPopup() {
     }, 200);
 }
 
-function siguientePregunta() {
+async function siguientePregunta() {
     if (preguntaActual < preguntas.length - 1) {
         mostrarPregunta(preguntaActual + 1);
     } else {
@@ -222,6 +222,7 @@ function siguientePregunta() {
                 `Has fallado más de la mitad de las preguntas (${respuestasIncorrectas} de ${totalPreguntas}).`,
                 false
             );
+            await finalizarSesionJuego(monedasGanadas = 0, monedasGastadas = 10, ganado = false)
         } else {
             // Mostrar popup de éxito
             mostrarPopup(
@@ -229,6 +230,7 @@ function siguientePregunta() {
                 `¡Felicidades! Has respondido correctamente ${respuestasCorrectas} de ${totalPreguntas} preguntas.`,
                 true
             );
+            await finalizarSesionJuego(monedasGanadas = 14, monedasGastadas = 0, ganado = true)
         }
 
         setTimeout(() => {

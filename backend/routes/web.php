@@ -16,8 +16,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/sesion-juego/finalizar', [SesionesController::class, 'finalizarSesionJuego'])
          ->name('sesion.juego.finalizar');
 
-    Route::post('/sesion-juego/guardar-respuesta', [SesionesController::class, 'guardarRespuesta'])
-         ->name('sesion.juego.guardar.respuesta');
+     Route::post('/sesion-juego/guardar-respuesta', [SesionesController::class, 'guardarRespuesta'])
+          ->name('sesion.juego.guardar.respuesta');
 });
 
 Route::get('/', [NavigationController::class, 'home'])->name('home');
