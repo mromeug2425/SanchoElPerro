@@ -64,11 +64,23 @@ class SesionesController extends Controller
         $inicio = Carbon::parse($sesionJuego->createdAt);
         $duracion = $inicio->diffInSeconds(Carbon::now());
         
+        // Obtener el usuario autenticado
+        $usuario = auth()->user();
+
+        // Obtener monedas ganadas y perdidas de la petición
+        $monedasGanadas = $request->monedas_ganadas ?? 0;
+        $monedasPerdidas = $request->monedas_perdidas ?? 0;
+
+        // Actualizar el total de monedas del usuario
+        $usuario->monedas += $monedasGanadas;
+        $usuario->monedas -= $monedasPerdidas;
+        $usuario->save();
+
         // 3. Actualizar los campos
         $sesionJuego->update([
             'duracion' => gmdate('H:i:s', $inicio->diffInSeconds(Carbon::now())),
-            'monedas_ganadas' => $request->monedas_ganadas ?? 0,
-            'monedas_perdidas' => $request->monedas_perdidas ?? 0,
+            'monedas_ganadas' => $monedasGanadas,
+            'monedas_perdidas' => $monedasPerdidas,
             'ganado' => $request->ganado ?? false
         ]);
         

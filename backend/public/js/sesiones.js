@@ -78,7 +78,7 @@ async function finalizarSesionJuego(monedasGanadas = 0, monedasGastadas = 0, gan
         body: JSON.stringify({
             sesion_juego_id: window.sesionJuegoId,
             monedas_ganadas: monedasGanadas,
-            monedas_gastadas: monedasGastadas,
+            monedas_perdidas: monedasGastadas, // <-- CAMBIO CLAVE
             ganado: ganado
         })
     })

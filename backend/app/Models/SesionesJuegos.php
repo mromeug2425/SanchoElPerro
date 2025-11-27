@@ -30,7 +30,7 @@ class SesionesJuegos extends Model
         'id_sesion',
         'duracion',
         'monedas_ganadas',
-        'monedas_gastadas',
+        'monedas_perdidas',
         'ganado',
         'createdAt'
     ];

@@ -222,7 +222,11 @@ async function siguientePregunta() {
                 `Has fallado más de la mitad de las preguntas (${respuestasIncorrectas} de ${totalPreguntas}).`,
                 false
             );
-            await finalizarSesionJuego(monedasGanadas = 0, monedasGastadas = 10, ganado = false)
+            // Asignar la finalización y redirección al botón del popup
+            document.querySelector("#popup-resultado button").onclick = async function () {
+                await finalizarSesionJuego(0, 74, false);
+                window.location.href = "/";
+            };
         } else {
             // Mostrar popup de éxito
             mostrarPopup(
@@ -230,15 +234,12 @@ async function siguientePregunta() {
                 `¡Felicidades! Has respondido correctamente ${respuestasCorrectas} de ${totalPreguntas} preguntas.`,
                 true
             );
-            await finalizarSesionJuego(monedasGanadas = 14, monedasGastadas = 0, ganado = true)
+            // Asignar la finalización y redirección al botón del popup
+            document.querySelector("#popup-resultado button").onclick = async function () {
+                await finalizarSesionJuego(115, 0, true);
+                window.location.href = "/";
+            };
         }
-
-        setTimeout(() => {
-            document.querySelector("#popup-resultado button").onclick =
-                function () {
-                    window.location.href = "/";
-                };
-        }, 100);
     }
 }
 
