@@ -6,6 +6,19 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\NavigationController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\MejorasController;
+use App\Http\Controllers\SesionesController;
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/sesion-juego/iniciar', [SesionesController::class, 'iniciarSesionJuego'])
+         ->name('sesion.juego.iniciar');
+    
+    Route::post('/sesion-juego/finalizar', [SesionesController::class, 'finalizarSesionJuego'])
+         ->name('sesion.juego.finalizar');
+
+     Route::post('/sesion-juego/guardar-respuesta', [SesionesController::class, 'guardarRespuesta'])
+          ->name('sesion.juego.guardar.respuesta');
+});
 
 Route::get('/', [NavigationController::class, 'home'])->name('home');
 

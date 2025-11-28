@@ -11,6 +11,7 @@ class Sesiones extends Model
     public $timestamps = false;
 
     protected $fillable = [
+        'id',
         'id_usuario',
         'duracion',
         'monedas_gastadas',
@@ -22,7 +23,7 @@ class Sesiones extends Model
     ];
 
     public function sesionJuegos() {
-        return $this->hasMany(Usuario::class, 'id_sesion');
+        return $this->hasMany(SesionesJuegos::class, 'id_sesion');
     }
 
     public function usuario() {
