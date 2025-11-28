@@ -2,6 +2,10 @@
 
 @section('title', config('app.name', 'SanchoElPerro') . ' - Juego 2')
 
+@push('head')
+	<meta name="csrf-token" content="{{ csrf_token() }}">
+@endpush
+
 @php
 	$backgroundImage = asset('img/backgrounds/joc2.png');
 @endphp
@@ -30,7 +34,7 @@
 @endpush
 
 @section('content')
-	<div class="w-full h-full flex flex-col p-4 relative font-jersey">
+	<div class="w-full h-full flex flex-col p-4 relative font-jersey" data-id-juego="{{ $id_juego }}">
 		<!-- Botón Atrás -->
 		<div class="absolute top-4 left-4 z-20">
 			<a href="{{ route('niveles') }}" 
@@ -131,6 +135,8 @@
 		</div>
 	</div>
 
+	<!-- Cargar sesiones.js primero para tracking -->
+	<script src="{{ asset('js/sesiones.js') }}"></script>
 	<script src="{{ asset('js/juego2animaciones.js') }}"></script>
 	<script src="{{ asset('js/juego2quicktime.js') }}"></script>
 	<script src="{{ asset('js/juego2popups.js') }}"></script>

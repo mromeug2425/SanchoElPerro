@@ -5,10 +5,15 @@ let tiempoRestante = 15;
 let intervaloTimer = null;
 let opcionArrastrada = null;
 let dragAndDropHabilitado = true;
+let respuestasCorrectas = 0;
+let respuestasIncorrectas = 0;
 
 // Cargar preguntas al iniciar la página
-document.addEventListener("DOMContentLoaded", function () {
-    cargarPreguntas(1);
+document.addEventListener("DOMContentLoaded", async function () {
+    if (window.ensureSesionJuego) { try { window.ensureSesionJuego(); } catch (e) {} }
+    try { if (window.sesionJuegoReady) { await window.sesionJuegoReady; } } catch (e) {}
+    const idJuegoAttr = document.querySelector('[data-id-juego]')?.getAttribute('data-id-juego') || 1;
+    await cargarPreguntas(parseInt(idJuegoAttr));
     inicializarDragAndDrop();
 });
 
@@ -69,6 +74,12 @@ function actualizarDisplayTimer() {
 function tiempoAgotado() {
     dragAndDropHabilitado = false;
     deshabilitarOpciones();
+    respuestasIncorrectas++;
+
+    // NUEVO: Guardar como respuesta incorrecta (sin respuesta del usuario)
+    const pregunta = preguntas[preguntaActual];
+    guardarRespuestaEnBD(pregunta, null, false);  // null = no respondió
+
     mostrarPopup(
         "¡TIEMPO AGOTADO!",
         "Se acabó el tiempo para responder esta pregunta.",
@@ -117,7 +128,7 @@ function mostrarPregunta(index) {
     resetearDropZone();
     dragAndDropHabilitado = true;
     habilitarOpciones();
-    
+
     const opciones = document.querySelectorAll('[data-opcion]');
     opciones.forEach(opcion => {
         opcion.addEventListener('dragstart', handleDragStart);
@@ -132,9 +143,14 @@ function verificarRespuesta(opcionSeleccionada) {
     deshabilitarOpciones();
 
     const pregunta = preguntas[preguntaActual];
+    const esCorrecta = pregunta.answer === opcionSeleccionada;
 
-    if (pregunta.answer === opcionSeleccionada) {
+    // NUEVO: Guardar la respuesta en la base de datos
+    guardarRespuestaEnBD(pregunta, opcionSeleccionada, esCorrecta);
+
+    if (esCorrecta) {
         console.log("¡Respuesta correcta! ✅");
+        respuestasCorrectas++;
         mostrarPopup(
             "¡CORRECTO!",
             "¡Excelente! Has acertado la respuesta.",
@@ -142,6 +158,7 @@ function verificarRespuesta(opcionSeleccionada) {
         );
     } else {
         console.log("Respuesta incorrecta ❌");
+        respuestasIncorrectas++;
         mostrarPopup(
             "INCORRECTO",
             `La respuesta correcta era la opción ${pregunta.answer}.`,
@@ -149,6 +166,7 @@ function verificarRespuesta(opcionSeleccionada) {
         );
     }
 }
+
 
 function mostrarPopup(titulo, mensaje, esCorrecto) {
     const popup = document.getElementById("popup-resultado");
@@ -186,22 +204,42 @@ function cerrarPopup() {
     }, 200);
 }
 
-function siguientePregunta() {
+async function siguientePregunta() {
     if (preguntaActual < preguntas.length - 1) {
         mostrarPregunta(preguntaActual + 1);
     } else {
         console.log("Fin del juego 🎉");
-        mostrarPopup(
-            "¡JUEGO COMPLETADO!",
-            "¡Felicidades! Has respondido todas las preguntas.",
-            true
-        );
-        setTimeout(() => {
-            document.querySelector("#popup-resultado button").onclick =
-                function () {
-                    window.location.href = "/";
-                };
-        }, 100);
+        console.log(`Correctas: ${respuestasCorrectas}, Incorrectas: ${respuestasIncorrectas}`);
+
+        // Verificar si falló más de la mitad
+        const totalPreguntas = preguntas.length;
+        const mitad = totalPreguntas / 2;
+
+        if (respuestasIncorrectas > mitad) {
+            // Mostrar popup de fallo
+            mostrarPopup(
+                "¡NO HAS SATISFECHO A TU SOBRINA!",
+                `Has fallado más de la mitad de las preguntas (${respuestasIncorrectas} de ${totalPreguntas}).`,
+                false
+            );
+            // Asignar la finalización y redirección al botón del popup
+            document.querySelector("#popup-resultado button").onclick = async function () {
+                await finalizarSesionJuego(0, 74, false);
+                window.location.href = "/";
+            };
+        } else {
+            // Mostrar popup de éxito
+            mostrarPopup(
+                "¡JUEGO COMPLETADO!",
+                `¡Felicidades! Has respondido correctamente ${respuestasCorrectas} de ${totalPreguntas} preguntas.`,
+                true
+            );
+            // Asignar la finalización y redirección al botón del popup
+            document.querySelector("#popup-resultado button").onclick = async function () {
+                await finalizarSesionJuego(115, 0, true);
+                window.location.href = "/";
+            };
+        }
     }
 }
 
@@ -224,7 +262,7 @@ function handleDragStart(e) {
         e.preventDefault();
         return;
     }
-    
+
     opcionArrastrada = e.target.dataset.opcion;
     e.target.classList.add('dragging');
     e.dataTransfer.effectAllowed = 'move';
@@ -313,4 +351,58 @@ function resetearDropZone() {
     dropZone.addEventListener('dragenter', handleDragOver, false);
     dropZone.addEventListener('dragleave', handleDragLeave, false);
     dropZone.addEventListener('drop', handleDrop, false);
+}
+
+async function guardarRespuestaEnBD(pregunta, respuestaUsuario, acertada) {
+    if (!window.sesionJuegoId && window.sesionJuegoReady) {
+        try { await window.sesionJuegoReady; } catch (e) {}
+    }
+    if (!window.sesionJuegoId) {
+        console.error('No hay sesión de juego activa');
+        return;
+    }
+
+    // Preparar las opciones como un objeto
+    const opciones = {
+        opcion_1: pregunta.opcion_1,
+        opcion_2: pregunta.opcion_2,
+        opcion_3: pregunta.opcion_3,
+        opcion_4: pregunta.opcion_4
+    };
+
+    // Enviar al backend
+    fetch('/sesion-juego/guardar-respuesta', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({
+            id_sesion_juegos: window.sesionJuegoId,
+            id_pregunta: pregunta.id,
+            acertada: acertada,
+            respuesta_usuario: respuestaUsuario,
+            respuesta_correcta: pregunta.answer,
+            opciones: opciones
+        })
+    })
+        .then(async response => {
+            if (!response.ok) {
+                const text = await response.text();
+                console.error('Error al guardar respuesta (HTTP ' + response.status + '):', text);
+                throw new Error('HTTP ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                console.log('✅ Respuesta guardada en BD:', data.respuesta_id);
+            } else {
+                console.error('❌ Error al guardar respuesta:', data.error);
+            }
+        })
+        .catch(error => console.error('❌ Error en la petición:', error));
 }

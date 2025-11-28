@@ -2,6 +2,10 @@
 
 @section('title', config('app.name', 'SanchoElPerro') . ' - Juego 4')
 
+@push('head')
+	<meta name="csrf-token" content="{{ csrf_token() }}">
+@endpush
+
 @php
 	$backgroundImage = asset('img/backgrounds/joc4.png');
 	$maxLife = 100;
@@ -9,7 +13,7 @@
 @endphp
 
 @section('content')
-	<div class="w-full h-full flex flex-col p-4">
+	<div class="w-full h-full flex flex-col p-4" data-id-juego="{{ $id_juego }}">
 		<!-- Botón Atrás -->
 		<div class="absolute top-4 left-4 z-20">
 			<a href="{{ route('home') }}" 
@@ -78,6 +82,8 @@
 	</div>
 
 	<!-- Include the game script -->
+	<!-- Cargar sesiones.js primero para tracking -->
+	<script src="{{ asset('js/sesiones.js') }}"></script>
 	<script src="{{ asset('js/juego4.js') }}"></script>
 	<script>
 		let game;
@@ -209,21 +215,44 @@
 			const result = game.evaluateExpression(playerNumbers, playerOperations);
 			
 			document.getElementById('result-display').querySelector('p').textContent = 'Result: ' + result;
-			
+
+            // Guardar respuesta en BD
+            const preguntaSimulada = {
+                id: null, 
+                opcion_1: challenge.numbers[0],
+                opcion_2: challenge.numbers[1],
+                opcion_3: challenge.numbers[2],
+                opcion_4: challenge.numbers[3],
+                answer: challenge.target
+            };
+            
+            guardarRespuestaEnBD(preguntaSimulada, result, isCorrect);
+
 			if (isCorrect) {
 				alert('🎉 Correct! You solved it!');
 				currentLife = Math.min(maxLife, currentLife + 10);
 				updateLifeBar();
+                
+                // Finalizar sesión con éxito (podríamos considerar cada acierto como una "sesión" o el juego completo)
+                // En este diseño de "juego infinito" hasta perder, quizás finalizamos al perder.
+                // O podríamos guardar progreso parcial.
 				setTimeout(startNewGame, 1000);
 			} else {
 				alert('❌ Wrong! Try again. (Target: ' + challenge.target + ', You got: ' + result + ')');
 				currentLife = Math.max(0, currentLife - 10);
 				updateLifeBar();
 				
-				// Reset player selection
-				playerNumbers = [];
-				playerOperations = [];
-				startNewGame();
+                if (currentLife <= 0) {
+                    // Game Over
+                    alert('Game Over!');
+                    finalizarSesionJuego(0, 0, false);
+                    window.location.href = "{{ route('home') }}";
+                } else {
+                    // Reset player selection
+                    playerNumbers = [];
+                    playerOperations = [];
+                    startNewGame();
+                }
 			}
 		}
 
@@ -232,5 +261,44 @@
 			document.getElementById('life-bar').style.height = percentage + '%';
 			document.getElementById('life-text').textContent = currentLife;
 		}
+
+        function guardarRespuestaEnBD(pregunta, respuestaUsuario, acertada) {
+            if (!window.sesionJuegoId) {
+                console.error('No hay sesión de juego activa');
+                return;
+            }
+
+            const opciones = {
+                opcion_1: pregunta.opcion_1,
+                opcion_2: pregunta.opcion_2,
+                opcion_3: pregunta.opcion_3,
+                opcion_4: pregunta.opcion_4
+            };
+
+            fetch('/sesion-juego/guardar-respuesta', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({
+                    id_sesion_juegos: window.sesionJuegoId,
+                    id_pregunta: pregunta.id, // Será null, el backend debe manejarlo o fallará (pero no detendrá el juego)
+                    acertada: acertada,
+                    respuesta_usuario: respuestaUsuario,
+                    respuesta_correcta: pregunta.answer,
+                    opciones: opciones
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('✅ Respuesta guardada en BD:', data.respuesta_id);
+                } else {
+                    console.error('❌ Error al guardar respuesta:', data.error);
+                }
+            })
+            .catch(error => console.error('❌ Error en la petición:', error));
+        }
 	</script>
 @endsection

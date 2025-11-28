@@ -2,6 +2,10 @@
 
 @section('title', config('app.name', 'SanchoElPerro') . ' - Juego 3')
 
+@push('head')
+	<meta name="csrf-token" content="{{ csrf_token() }}">
+@endpush
+
 @push('styles')
 	<link rel="stylesheet" href="{{ asset('css/dragableJuego3.css') }}">
 @endpush
@@ -11,7 +15,7 @@
 @endphp
 
 @section('content')
-	<div class="w-full h-full flex flex-col p-4">
+	<div class="w-full h-full flex flex-col p-4" data-id-juego="{{ $id_juego }}">
 		<!-- Botón Atrás -->
 		<div class="absolute top-4 left-4 z-20">
 			<a href="{{ route('home') }}" 
@@ -92,6 +96,8 @@
 			</button>
 		</div>
 	</div>
+	<!-- Cargar sesiones.js primero para que window.sesionJuegoId esté disponible -->
+	<script src="{{ asset('js/sesiones.js') }}"></script>
 	<script src="{{ asset('js/juego3.js') }}"></script>
 @endsection
 
