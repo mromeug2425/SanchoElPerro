@@ -74,6 +74,11 @@ class SesionesController extends Controller
         // Actualizar el total de monedas del usuario
         $usuario->monedas += $monedasGanadas;
         $usuario->monedas -= $monedasPerdidas;
+        
+        if (($request->ganado ?? false) && $sesionJuego->id_juego == 4) {
+            $usuario->tiquets_tienda += 1;
+        }
+        
         $usuario->save();
 
         // 3. Actualizar los campos

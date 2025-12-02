@@ -9,13 +9,38 @@ let clueUsed = false;
 let challengesCompleted = 0;
 let correctAnswers = 0;
 let totalChallenges = 4;
+let initialCoins = 0; // User's coins at game start
+let challengeAttempts = []; // Track all challenge attempts
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
+    // Initialize session tracking
+    if (window.ensureSesionJuego) {
+        try {
+            await window.ensureSesionJuego();
+        } catch (e) {
+            console.error("Failed to initialize session:", e);
+        }
+    }
+
+    // Wait for session to be ready
+    try {
+        if (window.sesionJuegoReady) {
+            await window.sesionJuegoReady;
+        }
+    } catch (e) {
+        console.error("Session not ready:", e);
+    }
+
     game = new MathChallengeGame();
-    cargarInfoJuego(3);
+
+    // Fetch user's current coins
+    await fetchUserCoins();
+
+    // Load game info (fixed: was 3, should be 4)
+    await cargarInfoJuego(4);
 });
 
-async function cargarInfoJuego(idJuego = 3) {
+async function cargarInfoJuego(idJuego = 4) {
     try {
         const baseUrl = window.BASE_URL || window.location.origin;
         const response = await fetch(`${baseUrl}/juego/info/${idJuego}`);
@@ -37,6 +62,23 @@ async function cargarInfoJuego(idJuego = 3) {
         startNewGame();
     } catch (error) {
         console.error("Error:", error);
+    }
+}
+
+async function fetchUserCoins() {
+    try {
+        // Get user coins from current authenticated user
+        // Since we don't have a specific API endpoint, we'll fetch from window or set to 0
+        // The backend will handle the actual coin deduction based on user's current coins
+        const usuario = window.usuario || {};
+        initialCoins = usuario.monedas || 0;
+        console.log("Game 4: Initial coins:", initialCoins);
+
+        // Note: If coins aren't available client-side, backend will use current user coins
+        // This is just for displaying to user during game
+    } catch (error) {
+        console.error("Error fetching user coins:", error);
+        initialCoins = 0;
     }
 }
 
@@ -81,14 +123,32 @@ function actualizarDisplayTimer() {
 function tiempoAgotado() {
     const remainingChallenges = totalChallenges - challengesCompleted;
 
-    alert(
-        `¡TIEMPO AGOTADO!\n\n Game Over!\nCompleted: ${challengesCompleted}/${totalChallenges}\nCorrect: ${correctAnswers}\nFailed: ${remainingChallenges} (timeout)\n\nFinal Score: ${correctAnswers}/${totalChallenges}`
+    console.log(
+        "Game 4: Tiempo agotado. Desafíos restantes:",
+        remainingChallenges
     );
 
-    challengesCompleted = 0;
-    correctAnswers = 0;
-    intervaloTimer = null;
-    setTimeout(startNewGame, 2000);
+    // Save incomplete challenges as failed (timeout)
+    for (let i = 0; i < remainingChallenges; i++) {
+        guardarJuego4EnBD(
+            challenge,
+            [],
+            [],
+            false,
+            true, // wasTimeout
+            game.correctNumbers || [],
+            game.correctOperations || []
+        );
+
+        challengeAttempts.push({
+            correct: false,
+            timeout: true,
+            target: challenge.target,
+        });
+    }
+
+    // Finalize session and redirect
+    setTimeout(() => finalizarYRedirigir(), 1000);
 }
 
 function startNewGame() {
@@ -283,6 +343,25 @@ function checkSolution() {
     const isCorrect = game.verifySolution(playerNumbers, playerOperations);
     const result = game.evaluateExpression(playerNumbers, playerOperations);
 
+    // Save to database
+    guardarJuego4EnBD(
+        challenge,
+        playerNumbers,
+        playerOperations,
+        isCorrect,
+        false, // not a timeout
+        game.correctNumbers || [],
+        game.correctOperations || []
+    );
+
+    // Track locally
+    challengeAttempts.push({
+        correct: isCorrect,
+        playerNumbers: [...playerNumbers],
+        playerOperations: [...playerOperations],
+        target: challenge.target,
+    });
+
     if (isCorrect) {
         challengesCompleted++;
         correctAnswers++;
@@ -293,18 +372,8 @@ function checkSolution() {
                 intervaloTimer = null;
             }
 
-            showWinAnimation();
-
-            setTimeout(() => {
-                alert(
-                    `¡FELICIDADES!\n\nYou completed all challenges!\nFinal Score: ${correctAnswers}/${totalChallenges} correct answers!`
-                );
-
-                challengesCompleted = 0;
-                correctAnswers = 0;
-                setTimeout(startNewGame, 2000);
-                hideWinAnimation();
-            }, 2000);
+            // Game complete - finalize session
+            finalizarYRedirigir();
         } else if (challengesCompleted === 2) {
             alert(
                 `Correct! Challenge ${challengesCompleted}/${totalChallenges} completed!`
@@ -330,4 +399,81 @@ function checkSolution() {
         playerOperations = [];
         clearSelection();
     }
+}
+
+async function finalizarYRedirigir() {
+    // Calculate results
+    const totalChallenges = challengeAttempts.length;
+    const correctCount = challengeAttempts.filter((a) => a.correct).length;
+    const incorrectCount = totalChallenges - correctCount;
+    const incorrectPercentage = incorrectCount / totalChallenges;
+
+    // Calculate coin loss (percentage of incorrect answers)
+    const coinsLost = Math.floor(initialCoins * incorrectPercentage);
+
+    // Determine if won (>= 50% correct)
+    const isWinner = correctCount >= totalChallenges / 2;
+
+    console.log("Game 4 Summary:", {
+        total: totalChallenges,
+        correct: correctCount,
+        incorrect: incorrectCount,
+        incorrectPercentage: (incorrectPercentage * 100).toFixed(1) + "%",
+        initialCoins: initialCoins,
+        coinsLost: coinsLost,
+        isWinner: isWinner,
+    });
+
+    // Show result popup
+    showResultPopup(correctCount, totalChallenges, coinsLost, isWinner);
+
+    // Finalize session
+    try {
+        await finalizarSesionJuego(
+            0, // monedas_ganadas (always 0 for Game 4)
+            coinsLost, // monedas_perdidas
+            isWinner // ganado
+        );
+
+        console.log("Game 4: Session finalized successfully");
+    } catch (error) {
+        console.error("Game 4: Error finalizing session:", error);
+    }
+}
+
+/**
+ * Show final result popup with game stats
+ */
+function showResultPopup(correct, total, coinsLost, isWinner) {
+    const percentage = Math.round((correct / total) * 100);
+
+    let title, message;
+
+    if (isWinner) {
+        title = "¡FELICIDADES!";
+        message =
+            `¡Has ganado!\n\n` +
+            `Aciertos: ${correct}/${total} (${percentage}%)\n` +
+            `Monedas perdidas: ${coinsLost}\n` +
+            `¡Has ganado 1 ticket!`;
+
+        // Show win animation
+        showWinAnimation();
+        setTimeout(() => hideWinAnimation(), 2000);
+    } else {
+        title = "GAME OVER";
+        message =
+            `No has alcanzado el mínimo.\n\n` +
+            `Aciertos: ${correct}/${total} (${percentage}%)\n` +
+            `Monedas perdidas: ${coinsLost}\n` +
+            `Necesitas al menos ${Math.ceil(total / 2)} aciertos.`;
+    }
+
+    // Show alert
+    alert(title + "\n\n" + message);
+
+    // Redirect to home
+    setTimeout(() => {
+        window.location.href = "/";
+    }, 500);
 }
