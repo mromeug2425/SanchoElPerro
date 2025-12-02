@@ -25,7 +25,7 @@
 
 	<script>
 		window.BASE_URL = '{{ url("/") }}';
-		window.API_PATH = '{{ env("API_PATH", "") }}'; // Keep for backward compatibility if needed
+		window.API_PATH = '{{ env("API_PATH", "") }}';
 	</script>
 	
 	@stack('head')

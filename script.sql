@@ -150,7 +150,19 @@ PRINT 'Base de datos SanchoElPerro creada exitosamente';
 GO
 
 INSERT INTO juegos (nombre, tiempo, cantidad_preguntas) VALUES
+('Juego 1', '00:00:10', 15);
+GO
+
+INSERT INTO juegos (nombre, tiempo, cantidad_preguntas) VALUES
+('Juego 2', '00:00:10', 15);
+GO
+
+INSERT INTO juegos (nombre, tiempo, cantidad_preguntas) VALUES
 ('Juego 3', '00:00:15', 5);
+GO
+
+INSERT INTO juegos (nombre, tiempo, cantidad_preguntas) VALUES
+('Juego 4', '00:02:00', 4);
 GO
 
 INSERT INTO preguntas (id_juego, pregunta, opcion_1, opcion_2, opcion_3, opcion_4, answer, media) VALUES
@@ -207,10 +219,6 @@ INSERT INTO preguntas (id_juego, pregunta, opcion_1, opcion_2, opcion_3, opcion_
 GO
 
 PRINT '50 preguntas de geometría insertadas exitosamente';
-GO
-
-INSERT INTO juegos (nombre, tiempo, cantidad_preguntas) VALUES
-('Juego 2', '00:00:10', 15);
 GO
 
 INSERT INTO preguntas (id_juego, pregunta, opcion_1, opcion_2, opcion_3, opcion_4, answer, media) VALUES
@@ -330,5 +338,5 @@ INSERT INTO mejoras ( nombre, activo, img, precio_nv1, precio_nv2, precio_nv3, p
 ( 'HELICOPTERO', 1, 'img/helicoptero.png', 250, 350, 450, 550),
 ( 'PERRO', 1, 'img/perro.png', 300, 400, 500, 600);
 
-    -- alter table de nivel 5
 
+    -- alter table de nivel 5
