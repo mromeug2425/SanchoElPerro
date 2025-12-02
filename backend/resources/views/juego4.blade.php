@@ -2,6 +2,10 @@
 
 @section('title', config('app.name', 'SanchoElPerro') . ' - Juego 4')
 
+@push('head')
+	<meta name="csrf-token" content="{{ csrf_token() }}">
+@endpush
+
 @php
 	$backgroundImage = asset('img/backgrounds/joc4.png');
 @endphp
