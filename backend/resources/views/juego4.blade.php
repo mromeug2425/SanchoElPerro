@@ -11,7 +11,7 @@
 @endphp
 
 @section('content')
-	<div class="w-full h-full flex flex-col p-4">
+	<div class="w-full h-full flex flex-col p-4" data-id-juego="4">
 		<div class="absolute top-4 left-4 z-20">
 			<a href="{{ route('home') }}" 
 			class="bg-gray-800 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-full shadow-lg uppercase tracking-wider text-sm transition-all duration-200 hover:scale-105">
@@ -133,6 +133,8 @@
 		}
 	</script>
 
+	<!-- Load sesiones.js FIRST for session tracking -->
+	<script src="{{ asset('js/sesiones.js') }}"></script>
 	<script src="{{ asset('js/juego4.js') }}"></script>
 	<script src="{{ asset('js/miniGameSancho.js') }}"></script>
 	<script src="{{ asset('js/miniGameSanchoUI.js') }}"></script>

@@ -79,7 +79,7 @@ CREATE TABLE sesiones_juegos (
     id BIGINT IDENTITY(1,1) NOT NULL,
     id_sesion BIGINT NOT NULL,
     id_juego BIGINT NOT NULL,
-    duracion TIME NOT NULL,
+    duracion TIME,
     monedas_ganadas BIGINT NOT NULL DEFAULT 0,
     monedas_perdidas BIGINT NOT NULL DEFAULT 0,
     ganado BIT NOT NULL,
@@ -94,7 +94,7 @@ GO
 CREATE TABLE sesiones_juegos_preguntas (
     id BIGINT IDENTITY(1,1) NOT NULL,
     id_sesion_juegos BIGINT NOT NULL,
-    id_pregunta BIGINT NOT NULL,
+    id_pregunta BIGINT,
     acertada BIT NOT NULL,
     respuesta_usuario TEXT NOT NULL,
     respuesta_correcta TEXT NOT NULL,
