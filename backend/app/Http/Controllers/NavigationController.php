@@ -6,6 +6,7 @@ use App\Models\Mejoras;
 use Illuminate\Http\Request;
 use App\Models\UsuariosMejoras;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\SesionesJuegosController;
 
 class NavigationController extends Controller
 {
@@ -80,11 +81,23 @@ class NavigationController extends Controller
     }
 
     public function niveles()
-    {
-        return view('niveles');
-    }
+    {   
+        $sesionesJuegosController = new SesionesJuegosController();
+        
+        // El juego 1 siempre está desbloqueado
+        $juego1Desbloqueado = true;
+        
+        // El juego 2 se desbloquea si se pasa el juego 2
+        $juego2Desbloqueado = true;
+        
+        // El juego 3 se desbloquea si se pasa el juego 3
+        $juego3Desbloqueado = $sesionesJuegosController->buscarVictoria(3);
+        
+        // El juego 4 se desbloquea si se pasa el juego 4
+        $juego4Desbloqueado = $sesionesJuegosController->buscarVictoria(1);
 
-    public function register()
+        return view('niveles', compact('juego1Desbloqueado', 'juego2Desbloqueado', 'juego3Desbloqueado', 'juego4Desbloqueado'));
+    }    public function register()
     {
         return view('register');
     }
