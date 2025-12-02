@@ -30,8 +30,8 @@ async function iniciarSesionJuego() {
         );
         return;
     }
-
-    return await fetch("/sesion-juego/iniciar", {
+    const baseUrl = window.BASE_URL || window.location.origin;
+    return await fetch(`${baseUrl}/sesion-juego/iniciar`, {
         method: "POST",
         // credentials: 'same-origin',
         headers: {
@@ -79,8 +79,8 @@ async function finalizarSesionJuego(
         console.error("No hay sesión de juego activa");
         return Promise.reject("No hay sesión activa");
     }
-
-    return await fetch("/sesion-juego/finalizar", {
+    const baseUrl = window.BASE_URL || window.location.origin;
+    return await fetch(`${baseUrl}/sesion-juego/finalizar`, {
         method: "POST",
         credentials: "same-origin",
         headers: {
@@ -190,7 +190,8 @@ async function guardarJuego4EnBD(
     });
 
     // Send to backend
-    fetch("/sesion-juego/guardar-respuesta", {
+    const baseUrl = window.BASE_URL || window.location.origin;
+    fetch(`${baseUrl}/sesion-juego/guardar-respuesta`, {
         method: "POST",
         credentials: "same-origin",
         headers: {
