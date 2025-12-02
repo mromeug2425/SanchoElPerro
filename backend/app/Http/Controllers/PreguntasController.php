@@ -59,5 +59,45 @@ class PreguntasController extends Controller{
             'tiempo' => $tiempoSegundos
         ]);
     }
+
+    public function obtenerInfoJuego($id_juego){
+        $juego = Juegos::where('id', $id_juego)->first();
+
+        if (!$juego) {
+            return response()->json(['error' => 'Juego no encontrado'], 404);
+        }
+
+        $tiempoString = $juego->tiempo;
+        $tiempoSegundos = 15;
+        
+        if ($tiempoString) {
+            Log::info('Tiempo original de la BD: ' . $tiempoString . ' (tipo: ' . gettype($tiempoString) . ')');
+            
+            if (is_object($tiempoString)) {
+                $horas = $tiempoString->hour == 12 ? 0 : $tiempoString->hour;
+                $tiempoSegundos = ($horas * 3600) + ($tiempoString->minute * 60) + $tiempoString->second;
+            } else {
+                if (preg_match('/(\d{1,2}):(\d{2}):(\d{2})/', $tiempoString, $matches)) {
+                    $horas = (int)$matches[1];
+                    $minutos = (int)$matches[2];
+                    $segundos = (int)$matches[3];
+                    
+                    if ($horas == 12 && stripos($tiempoString, 'AM') !== false) {
+                        $horas = 0;
+                    }
+                    
+                    $tiempoSegundos = ($horas * 3600) + ($minutos * 60) + $segundos;
+                    Log::info("Extraído - Horas: {$horas}, Minutos: {$minutos}, Segundos: {$segundos}");
+                }
+            }
+            
+            Log::info('Tiempo convertido a segundos: ' . $tiempoSegundos);
+        }
+
+        return response()->json([
+            'tiempo' => $tiempoSegundos,
+            'cantidad_preguntas' => $juego->cantidad_preguntas ?? 5
+        ]);
+    }
     
 }

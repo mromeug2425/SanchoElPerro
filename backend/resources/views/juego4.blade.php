@@ -8,13 +8,10 @@
 
 @php
 	$backgroundImage = asset('img/backgrounds/joc4.png');
-	$maxLife = 100;
-	$currentLife = 20; // Change this value to see the bar change
 @endphp
 
 @section('content')
-	<div class="w-full h-full flex flex-col p-4" data-id-juego="{{ $id_juego }}">
-		<!-- Botón Atrás -->
+	<div class="w-full h-full flex flex-col p-4">
 		<div class="absolute top-4 left-4 z-20">
 			<a href="{{ route('home') }}" 
 			class="bg-gray-800 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-full shadow-lg uppercase tracking-wider text-sm transition-all duration-200 hover:scale-105">
@@ -22,10 +19,18 @@
 			</a>
 		</div>
 
+		<div class="absolute top-[60%] right-[35%] z-20">
+			<img src="{{ asset('img/personajes/sancho/sancho.png') }}" alt="sancho" class="w-48 h-48 object-contain">
+		</div>
+
+		<div class="absolute bottom-[-1%] right-[55%] z-20">
+			<img src="{{ asset('img/personajes/player/player_espaldas.png') }}" alt="player_espaldas" class="w-32 h-32 object-contain">
+		</div>
+
 		<main class="flex-1 flex items-start justify-center pt-20">
 			<div class="animate-fade-in-scale w-full">
-				<!-- Contenido del Juego 4 -->
-				<div class="text-center w-full justify-between flex items-center">
+				<div class="text-center w-full justify-between flex items-start">
+
 					<div class="text-center flex gap-4">
 						<div id="numbers-container" class="text-center flex flex-col gap-4">
 							<!-- Numbers will be dynamically generated here -->
@@ -45,35 +50,18 @@
 							<button id="clear-btn" onclick="clearSelection()" class="bg-[#D97706] hover:bg-[#B45309] border-2 border-black text-white font-jersey p-4 rounded-xl shadow-md transition-all">
 								Clear
 							</button>
-							<button id="new-game-btn" onclick="startNewGame()" class="bg-[#347E2B] hover:bg-[#2C6B23] border-2 border-black text-white font-jersey p-4 rounded-xl shadow-md transition-all">
-								New Game
-							</button>
 						</div>
 						<div class="text-center flex flex-col gap-4">
 							<div id="target-display">
 								<x-dialogo bg_color="#3C3B4F" border_color="#000000" text="0" />
 							</div>
-							<div id="result-display">
-								<x-dialogo bg_color="#3C3B4F" border_color="#000000" text="Result: ?" />
+							<div id="timer" class="bg-white border-2 border-[#3C3B4F] rounded-xl shadow-md px-6 py-4 text-center">
+								<div class="text-sm font-jersey text-gray-600">TIEMPO</div>
+								<div id="tiempo-restante" class="text-4xl font-bold font-jersey text-[#3C3B4F]">60</div>
 							</div>
-						</div>
-						<div class="text-center flex flex-col gap-4">
-							<div class="flex flex-col items-center">
-								<div class="relative w-12 h-64 bg-gray-800 rounded-full border-4 border-black shadow-lg overflow-hidden">
-									<div class="absolute inset-0 bg-red-900/30"></div>
-									
-									<div id="life-bar" class="absolute bottom-0 left-0 right-0 transition-all duration-300 ease-out"
-										 style="height: {{ ($currentLife / $maxLife) * 100 }}%;">
-										<div class="w-full h-full bg-red-600"></div>
-									</div>
-									
-									<div class="absolute inset-0 flex items-center justify-center z-10">
-										<span id="life-text" class="font-jersey text-white text-lg font-bold drop-shadow-lg">
-											{{ $currentLife }}
-										</span>
-									</div>
-								</div>
-							</div>
+							<button id="clue-btn" onclick="useClue()" class="hidden bg-[#FBB900] hover:bg-[#E5A800] border-2 border-black text-white font-jersey p-4 rounded-xl shadow-md transition-all animate-pulse">
+								Pista
+							</button>
 						</div>
 					</div>
 				</div>
@@ -81,224 +69,72 @@
 		</main>
 	</div>
 
-	<!-- Include the game script -->
-	<!-- Cargar sesiones.js primero para tracking -->
-	<script src="{{ asset('js/sesiones.js') }}"></script>
-	<script src="{{ asset('js/juego4.js') }}"></script>
+	<div id="mini-game-overlay" class="hidden fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-80">
+		<div class="relative bg-gray-900 rounded-xl p-8 shadow-2xl">
+			<div class="text-center mb-4">
+				<h2 class="text-3xl font-jersey text-white mb-2">¡ATAQUE ESPECIAL DE SANCHO!</h2>
+				<div class="flex justify-center gap-8 items-center">
+					<div class="text-center">
+						<div class="text-sm font-jersey text-gray-400">TIEMPO</div>
+						<div id="minigame-timer" class="text-4xl font-bold font-jersey text-[#FBB900]">20</div>
+					</div>
+					<div class="text-center">
+						<div class="text-sm font-jersey text-gray-400">SEGUNDOS</div>
+						<div id="minigame-score" class="text-4xl font-bold font-jersey text-white">+0s</div>
+					</div>
+				</div>
+			</div>
+			
+			<canvas id="minigame-canvas" class="border-4 border-[#3C3B4F] rounded-lg bg-gray-800"></canvas>
+			
+			<div class="mt-4 text-center">
+				<p class="text-gray-400 font-jersey mt-2">Mueve el ratón para apuntar | Presiona ESPACIO para disparar</p>
+			</div>
+		</div>
+	</div>
+
+	<!-- Animated win -->
+	<div id="win-character" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+		<img id="character-sprite" src="{{ asset('img/personajes/black/up.png') }}" alt="Character" class="w-64 h-64 object-contain animate-bounce">
+	</div>
+
 	<script>
-		let game;
-		let challenge;
-		let playerNumbers = [];
-		let playerOperations = [];
-		let maxLife = {{ $maxLife }};
-		let currentLife = {{ $currentLife }};
-
-		// Initialize game on page load
-		document.addEventListener('DOMContentLoaded', function() {
-			game = new MathChallengeGame();
-			startNewGame();
-		});
-
-		function startNewGame() {
-			challenge = game.generateChallenge();
-			playerNumbers = [];
-			playerOperations = [];
+		let characterAnimationInterval = null;
+		
+		function showWinAnimation() {
+			const winContainer = document.getElementById('win-character');
+			const sprite = document.getElementById('character-sprite');
+			const images = [
+				'{{ asset('img/personajes/black/up.png') }}',
+				'{{ asset('img/personajes/black/down.png') }}'
+			];
+			let currentIndex = 0;
 			
-			// Update target display
-			document.getElementById('target-display').querySelector('p').textContent = 'Target: ' + challenge.target;
-			document.getElementById('result-display').querySelector('p').textContent = 'Result: ?';
-			document.getElementById('player-expression').querySelector('p').textContent = 'Click numbers & operations';
+			winContainer.classList.remove('hidden');
 			
-			// Render numbers
-			renderNumbers(challenge.numbers);
-			
-			// Render operations
-			renderOperations(challenge.operations);
-			
-			console.log('New challenge:', challenge);
-			console.log('Solution:', challenge.solution.expression);
-		}
-
-		function renderNumbers(numbers) {
-			const container = document.getElementById('numbers-container');
-			container.innerHTML = '';
-			
-			numbers.forEach((num, index) => {
-				const btn = document.createElement('button');
-				btn.className = 'bg-[#347E2B] hover:bg-[#2C6B23] border-2 border-black text-white font-jersey p-4 rounded-xl shadow-md transition-all min-h-[60px] min-w-[80px] text-xl';
-				btn.textContent = num;
-				btn.onclick = () => addNumber(num, index);
-				btn.id = 'num-' + index;
-				container.appendChild(btn);
-			});
-		}
-
-		function renderOperations(operations) {
-			const container = document.getElementById('operations-container');
-			container.innerHTML = '';
-			
-			operations.forEach((op, index) => {
-				const btn = document.createElement('button');
-				btn.className = 'bg-[#0C3826] hover:bg-[#0A2E1F] border-2 border-black text-white font-jersey p-4 rounded-xl shadow-md transition-all min-h-[60px] min-w-[80px] text-xl';
-				btn.textContent = op;
-				btn.onclick = () => addOperation(op, index);
-				btn.id = 'op-' + index;
-				container.appendChild(btn);
-			});
-		}
-
-		function addNumber(num, index) {
-			const btn = document.getElementById('num-' + index);
-			if (btn.disabled) return;
-			
-			playerNumbers.push(num);
-			btn.disabled = true;
-			btn.classList.add('opacity-50', 'cursor-not-allowed');
-			updateExpression();
-		}
-
-		function addOperation(op, index) {
-			const btn = document.getElementById('op-' + index);
-			if (btn.disabled) return;
-			
-			playerOperations.push(op);
-			btn.disabled = true;
-			btn.classList.add('opacity-50', 'cursor-not-allowed');
-			updateExpression();
-		}
-
-		function updateExpression() {
-			let expr = '';
-			for (let i = 0; i < playerNumbers.length; i++) {
-				expr += playerNumbers[i];
-				if (i < playerOperations.length) {
-					expr += ' ' + playerOperations[i] + ' ';
-				}
+			if (characterAnimationInterval) {
+				clearInterval(characterAnimationInterval);
 			}
-			document.getElementById('player-expression').querySelector('p').textContent = expr || 'Click numbers & operations';
+			
+			characterAnimationInterval = setInterval(function() {
+				currentIndex = (currentIndex + 1) % 2;
+				sprite.src = images[currentIndex];
+			}, 300);
 		}
-
-		function clearSelection() {
-			// Reset player selections
-			playerNumbers = [];
-			playerOperations = [];
+		
+		function hideWinAnimation() {
+			const winContainer = document.getElementById('win-character');
+			winContainer.classList.add('hidden');
 			
-			// Re-enable all number buttons
-			challenge.numbers.forEach((num, index) => {
-				const btn = document.getElementById('num-' + index);
-				if (btn) {
-					btn.disabled = false;
-					btn.classList.remove('opacity-50', 'cursor-not-allowed');
-				}
-			});
-			
-			// Re-enable all operation buttons
-			challenge.operations.forEach((op, index) => {
-				const btn = document.getElementById('op-' + index);
-				if (btn) {
-					btn.disabled = false;
-					btn.classList.remove('opacity-50', 'cursor-not-allowed');
-				}
-			});
-			
-			// Reset expression display
-			updateExpression();
-		}
-
-		function checkSolution() {
-			if (playerNumbers.length !== 4 || playerOperations.length !== 3) {
-				alert('Please select all 4 numbers and 3 operations!');
-				return;
-			}
-
-			const isCorrect = game.verifySolution(playerNumbers, playerOperations);
-			const result = game.evaluateExpression(playerNumbers, playerOperations);
-			
-			document.getElementById('result-display').querySelector('p').textContent = 'Result: ' + result;
-
-            // Guardar respuesta en BD
-            const preguntaSimulada = {
-                id: null, 
-                opcion_1: challenge.numbers[0],
-                opcion_2: challenge.numbers[1],
-                opcion_3: challenge.numbers[2],
-                opcion_4: challenge.numbers[3],
-                answer: challenge.target
-            };
-            
-            guardarRespuestaEnBD(preguntaSimulada, result, isCorrect);
-
-			if (isCorrect) {
-				alert('🎉 Correct! You solved it!');
-				currentLife = Math.min(maxLife, currentLife + 10);
-				updateLifeBar();
-                
-                // Finalizar sesión con éxito (podríamos considerar cada acierto como una "sesión" o el juego completo)
-                // En este diseño de "juego infinito" hasta perder, quizás finalizamos al perder.
-                // O podríamos guardar progreso parcial.
-				setTimeout(startNewGame, 1000);
-			} else {
-				alert('❌ Wrong! Try again. (Target: ' + challenge.target + ', You got: ' + result + ')');
-				currentLife = Math.max(0, currentLife - 10);
-				updateLifeBar();
-				
-                if (currentLife <= 0) {
-                    // Game Over
-                    alert('Game Over!');
-                    finalizarSesionJuego(0, 0, false);
-                    window.location.href = "{{ route('home') }}";
-                } else {
-                    // Reset player selection
-                    playerNumbers = [];
-                    playerOperations = [];
-                    startNewGame();
-                }
+			if (characterAnimationInterval) {
+				clearInterval(characterAnimationInterval);
+				characterAnimationInterval = null;
 			}
 		}
-
-		function updateLifeBar() {
-			const percentage = (currentLife / maxLife) * 100;
-			document.getElementById('life-bar').style.height = percentage + '%';
-			document.getElementById('life-text').textContent = currentLife;
-		}
-
-        function guardarRespuestaEnBD(pregunta, respuestaUsuario, acertada) {
-            if (!window.sesionJuegoId) {
-                console.error('No hay sesión de juego activa');
-                return;
-            }
-
-            const opciones = {
-                opcion_1: pregunta.opcion_1,
-                opcion_2: pregunta.opcion_2,
-                opcion_3: pregunta.opcion_3,
-                opcion_4: pregunta.opcion_4
-            };
-
-            fetch('/sesion-juego/guardar-respuesta', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify({
-                    id_sesion_juegos: window.sesionJuegoId,
-                    id_pregunta: pregunta.id, // Será null, el backend debe manejarlo o fallará (pero no detendrá el juego)
-                    acertada: acertada,
-                    respuesta_usuario: respuestaUsuario,
-                    respuesta_correcta: pregunta.answer,
-                    opciones: opciones
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    console.log('✅ Respuesta guardada en BD:', data.respuesta_id);
-                } else {
-                    console.error('❌ Error al guardar respuesta:', data.error);
-                }
-            })
-            .catch(error => console.error('❌ Error en la petición:', error));
-        }
 	</script>
+
+	<script src="{{ asset('js/juego4.js') }}"></script>
+	<script src="{{ asset('js/miniGameSancho.js') }}"></script>
+	<script src="{{ asset('js/miniGameSanchoUI.js') }}"></script>
+	<script src="{{ asset('js/juego4HandleUI.js') }}"></script>
 @endsection

@@ -38,7 +38,7 @@ class LoginController extends Controller
 		]);
 
 		$user = Usuario::where('nombre_usuario', $credentials['username'])->first();
-		
+
 		if ($user) {
 			$openSessions = Sesiones::where('id_usuario', $user->id)
 				->whereNull('duracion')
@@ -155,9 +155,9 @@ class LoginController extends Controller
 		}
 
 		Auth::logout();
-		
+
 		$request->session()->invalidate();
-		
+
 		$request->session()->regenerateToken();
 
 		return redirect()->route('home')->with('success', '¡Hasta pronto!');
