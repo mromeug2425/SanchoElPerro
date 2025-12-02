@@ -150,7 +150,19 @@ PRINT 'Base de datos SanchoElPerro creada exitosamente';
 GO
 
 INSERT INTO juegos (nombre, tiempo, cantidad_preguntas) VALUES
+('Juego 1', '00:00:10', 15);
+GO
+
+INSERT INTO juegos (nombre, tiempo, cantidad_preguntas) VALUES
+('Juego 2', '00:00:10', 15);
+GO
+
+INSERT INTO juegos (nombre, tiempo, cantidad_preguntas) VALUES
 ('Juego 3', '00:00:15', 5);
+GO
+
+INSERT INTO juegos (nombre, tiempo, cantidad_preguntas) VALUES
+('Juego 4', '00:02:00', 4);
 GO
 
 INSERT INTO preguntas (id_juego, pregunta, opcion_1, opcion_2, opcion_3, opcion_4, answer, media) VALUES
@@ -209,18 +221,14 @@ GO
 PRINT '50 preguntas de geometría insertadas exitosamente';
 GO
 
-INSERT INTO juegos (nombre, tiempo, cantidad_preguntas) VALUES
-('Juego 2', '00:00:10', 25);
-GO
-
 INSERT INTO preguntas (id_juego, pregunta, opcion_1, opcion_2, opcion_3, opcion_4, answer, media) VALUES
 (2, 'Cuanto es 7 x 8?', '54', '56', '64', '58', 2, NULL),
 (2, 'Cuanto es 45 / 5?', '8', '9', '10', '12', 2, NULL),
 (2, 'Cual es la raiz cuadrada de 81?', '8', '9', '10', '11', 2, NULL),
 (2, 'Si 5x = 20, cuanto vale x?', '2', '3', '4', '5', 3, NULL),
-(2, 'Cuanto es 25% de 200?', '25', '40', '50', '75', 2, NULL),
-(2, 'Que numero es mayor?', '0,75', '3/4', 'Son iguales', '1/2', 3, NULL),
-(2, 'Si un triangulo tiene lados 3, 4 y 5, que tipo de triangulo es?', 'Isosceles', 'Escaleno', 'Rectangulo', 'Equilatero', 3, NULL),
+(2, 'Cuanto es 25% de 200?', '25', '40', '50', '75', 3, NULL),
+(2, 'Que numero es mayor?', '0,75', '1/4', 'Son iguales', '1/2', 1, NULL),
+(2, 'Si un triangulo tiene lados 3, 4 y 6, que tipo de triangulo es?', 'Isosceles', 'Escaleno', 'Rectangulo', 'Equilatero', 2, NULL),
 (2, 'Cuanto es (6 + 4) x 2?', '20', '16', '12', '10', 1, NULL),
 (2, 'Cual es el resultado de 3 al cuadrado + 4 al cuadrado?', '12', '24', '25', '49', 3, NULL),
 (2, 'Cuanto es 0,5 + 0,25?', '0,7', '0,75', '0,8', '1', 2, NULL),
@@ -236,7 +244,7 @@ INSERT INTO preguntas (id_juego, pregunta, opcion_1, opcion_2, opcion_3, opcion_
 (2, 'Cuanto es 4 x (2 + 3)?', '10', '12', '20', '24', 3, NULL),
 (2, 'Cual es el valor de x si 12 + x = 20?', '6', '8', '10', '12', 2, NULL),
 (2, 'Que figura tiene 4 lados iguales y 4 angulos rectos?', 'Rectangulo', 'Cuadrado', 'Rombo', 'Trapecio', 2, NULL),
-(2, 'Cual es la mitad de 3/4?', '1/2', '3/8', '1/4', '2/3', 1, NULL),
+(2, 'Cual es la mitad de 3/4?', '1/2', '3/8', '1/4', '2/3', 2, NULL),
 (2, 'Si hoy es martes, que dia sera dentro de 5 dias?', 'Viernes', 'Domingo', 'Lunes', 'Sabado', 2, NULL),
 (2, 'Cuanto es 11 x 12?', '121', '132', '142', '112', 2, NULL),
 (2, 'Cuanto es 9 + 6 / 3?', '3', '13', '11', '15', 3, NULL),
@@ -251,7 +259,7 @@ INSERT INTO preguntas (id_juego, pregunta, opcion_1, opcion_2, opcion_3, opcion_
 (2, 'Cuanto es 10% de 450?', '40', '45', '50', '55', 2, NULL),
 (2, 'Cual es el triple de 9?', '18', '27', '36', '30', 2, NULL),
 (2, 'Cuanto es 14 + 28 + 14?', '42', '50', '56', '60', 3, NULL),
-(2, 'Cuanto es 90 / 9?', '8', '9', '10', '12', 2, NULL),
+(2, 'Cuanto es 90 / 9?', '8', '9', '10', '12', 3, NULL),
 (2, 'Cual es la raiz cuadrada de 100?', '9', '10', '11', '12', 2, NULL),
 (2, 'Que numero falta: 5, 10, 15, ?, 25?', '18', '20', '22', '23', 2, NULL),
 (2, 'Cuanto es 2 x 2 x 2 x 2?', '6', '8', '10', '16', 4, NULL),
@@ -297,7 +305,7 @@ INSERT INTO preguntas (id_juego, pregunta, opcion_1, opcion_2, opcion_3, opcion_
 (2, 'Cuanto es 0,2 x 100?', '2', '10', '20', '200', 3, NULL),
 (2, 'Que numero falta: 10, 20, 30, ?, 50?', '35', '38', '40', '45', 3, NULL),
 (2, 'Cuanto es 1/2 de 200?', '50', '75', '100', '125', 3, NULL),
-(2, 'Cuanto es 7 + 3 x 2?', '14', '16', '18', '20', 1, NULL),
+(2, 'Cuanto es 7 + 3 x 2?', '13', '16', '18', '20', 1, NULL),
 (2, 'Cual es la raiz cuadrada de 121?', '10', '11', '12', '13', 2, NULL),
 (2, 'Cuanto es 5 x 0?', '0', '5', '1', '10', 1, NULL),
 (2, 'Que numero es divisible entre 9?', '18', '19', '20', '21', 1, NULL),
@@ -317,7 +325,7 @@ INSERT INTO preguntas (id_juego, pregunta, opcion_1, opcion_2, opcion_3, opcion_
 (2, 'Que numero es multiplo de 9?', '18', '20', '22', '24', 1, NULL),
 (2, 'Cuanto es 8 x 8?', '56', '60', '64', '72', 3, NULL),
 (2, 'Cuanto es 5 + 15 + 20?', '35', '40', '45', '50', 2, NULL),
-(2, 'Cuanto es 0,1 x 1000?', '10', '100', '1', '0,01', 1, NULL),
+(2, 'Cuanto es 0,1 x 1000?', '10', '100', '1', '0,01', 2, NULL),
 (2, 'Cuanto es 10 al cuadrado?', '50', '100', '150', '200', 2, NULL),
 (2, 'Cuanto es 60 / 5?', '10', '12', '15', '20', 3, NULL);
 GO
@@ -330,10 +338,5 @@ INSERT INTO mejoras ( nombre, activo, img, precio_nv1, precio_nv2, precio_nv3, p
 ( 'HELICOPTERO', 1, 'img/helicoptero.png', 250, 350, 450, 550),
 ( 'PERRO', 1, 'img/perro.png', 300, 400, 500, 600);
 
+
     -- alter table de nivel 5
-
-
-INSERT INTO juegos (nombre, tiempo, cantidad_preguntas) VALUES
-('Juego 4', '00:02:00', 4);
-GO
-
