@@ -104,7 +104,7 @@ class NavigationController extends Controller
 
     public function juego1()
     {
-        return view('juego1', ['id_juego' => 3]);
+        return view('juego1', ['id_juego' => 1]);
     }
 
     public function juego2()
@@ -114,7 +114,7 @@ class NavigationController extends Controller
 
     public function juego3()
     {
-        return view('juego3', ['id_juego' => 1]);
+        return view('juego3', ['id_juego' => 3]);
     }
 
     public function juego4()
