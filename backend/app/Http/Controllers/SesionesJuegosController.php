@@ -2,11 +2,53 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SesionesJuegos;
+use App\Models\Sesiones;
 use Illuminate\Http\Request;
+use App\Models\SesionesJuegos;
 
 class SesionesJuegosController extends Controller
 {
+
+    public function buscarSessionesUsuario(){
+
+        $sesionUsuario = Sesiones::where('id_usuario', auth()->user()->id)
+                        ->pluck('id');
+        
+        return $sesionUsuario;
+    }
+
+    public function buscarVictoria($id_juego){
+
+        $sesionUsuario = $this->buscarSessionesUsuario();
+
+        $juegoGanado = SesionesJuegos::whereIn('id_sesion', $sesionUsuario)
+                        ->where('id_juego', $id_juego) 
+                        ->where('ganado', 1)
+                        ->get();
+
+        $victoriaJuego =  !$juegoGanado->isEmpty();
+
+        return $victoriaJuego;
+        
+    }
+
+    public function buscarVictoriaMultiples($ids_juegos){
+
+        $sesionUsuario = $this->buscarSessionesUsuario();
+
+        // Si recibe un solo ID, lo convierte en array
+        $juegos = is_array($ids_juegos) ? $ids_juegos : [$ids_juegos];
+
+        $juegoGanado = SesionesJuegos::whereIn('id_sesion', $sesionUsuario)
+                        ->whereIn('id_juego', $juegos) 
+                        ->where('ganado', 1)
+                        ->get();
+
+        $victoriaJuego =  !$juegoGanado->isEmpty();
+
+        return $victoriaJuego;
+        
+    }
     /**
      * Display a listing of the resource.
      */

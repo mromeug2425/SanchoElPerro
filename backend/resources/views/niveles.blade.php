@@ -33,58 +33,114 @@
 					<div class="grid grid-cols-2 gap-x-8 gap-y-12 w-full h-full">
 						<!-- Nivel 1 -->
 						<div class="nivel-card">
-							<a href="{{ route('juego1') }}" class="nivel-link">
-								<div class="nivel-wrapper">
+							@if($juego1Desbloqueado)
+								<a href="{{ route('juego1') }}" class="nivel-link">
+									<div class="nivel-wrapper">
+										<img src="{{ asset('img/backgrounds/chincheta.png') }}" 
+											alt="Chincheta" 
+											class="chincheta chincheta-1">
+										<img src="{{ asset('img/backgrounds/joc1.png') }}" 
+											alt="Nivel 1" 
+											class="nivel-image">
+									</div>
+								</a>
+							@else
+								<div class="nivel-wrapper opacity-50 cursor-not-allowed">
 									<img src="{{ asset('img/backgrounds/chincheta.png') }}" 
 										alt="Chincheta" 
 										class="chincheta chincheta-1">
 									<img src="{{ asset('img/backgrounds/joc1.png') }}" 
 										alt="Nivel 1" 
 										class="nivel-image">
+									<div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 rounded">
+										<span class="text-white font-bold text-lg">BLOQUEADO</span>
+									</div>
 								</div>
-							</a>
+							@endif
 						</div>
 
 						<!-- Nivel 2 -->
 						<div class="nivel-card">
-							<a href="{{ route('juego2') }}" class="nivel-link">
-								<div class="nivel-wrapper">
+							@if($juego2Desbloqueado)
+								<a href="{{ route('juego2') }}" class="nivel-link">
+									<div class="nivel-wrapper">
+										<img src="{{ asset('img/backgrounds/chincheta.png') }}" 
+											alt="Chincheta" 
+											class="chincheta chincheta-2">
+										<img src="{{ asset('img/backgrounds/joc2.png') }}" 
+											alt="Nivel 2" 
+											class="nivel-image">
+									</div>
+								</a>
+							@else
+								<div class="nivel-wrapper opacity-50 cursor-not-allowed">
 									<img src="{{ asset('img/backgrounds/chincheta.png') }}" 
 										alt="Chincheta" 
 										class="chincheta chincheta-2">
 									<img src="{{ asset('img/backgrounds/joc2.png') }}" 
 										alt="Nivel 2" 
 										class="nivel-image">
+									<div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 rounded">
+										<span class="text-white font-bold text-lg">BLOQUEADO</span>
+									</div>
 								</div>
-							</a>
+							@endif
 						</div>
 
 						<!-- Nivel 3 -->
 						<div class="nivel-card">
-							<a href="{{ route('juego3') }}" class="nivel-link">
-								<div class="nivel-wrapper">
+							@if($juego3Desbloqueado)
+								<a href="{{ route('juego3') }}" class="nivel-link">
+									<div class="nivel-wrapper">
+										<img src="{{ asset('img/backgrounds/chincheta.png') }}" 
+											alt="Chincheta" 
+											class="chincheta chincheta-3">
+										<img src="{{ asset('img/backgrounds/joc3.png') }}" 
+											alt="Nivel 3" 
+											class="nivel-image">
+									</div>
+								</a>
+							@else
+								<div class="nivel-wrapper opacity-50 cursor-not-allowed">
 									<img src="{{ asset('img/backgrounds/chincheta.png') }}" 
 										alt="Chincheta" 
 										class="chincheta chincheta-3">
 									<img src="{{ asset('img/backgrounds/joc3.png') }}" 
 										alt="Nivel 3" 
 										class="nivel-image">
+									<div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 rounded">
+										<span class="text-white font-bold text-lg">BLOQUEADO</span>
+									</div>
 								</div>
-							</a>
+							@endif
 						</div>
 
 						<!-- Nivel 4 -->
 						<div class="nivel-card">
-							<a href="{{ route('juego4') }}" class="nivel-link">
-								<div class="nivel-wrapper">
+							@if($juego4Desbloqueado)
+								<a href="{{ route('juego4') }}" class="nivel-link">
+									<div class="nivel-wrapper">
+										<img src="{{ asset('img/backgrounds/chincheta.png') }}" 
+											alt="Chincheta" 
+											class="chincheta chincheta-4">
+										<img src="{{ asset('img/backgrounds/joc4.png') }}" 
+											alt="Nivel 4" 
+											class="nivel-image">
+									</div>
+								</a>
+							@else
+								<div class="nivel-wrapper opacity-50 cursor-not-allowed">
 									<img src="{{ asset('img/backgrounds/chincheta.png') }}" 
 										alt="Chincheta" 
 										class="chincheta chincheta-4">
 									<img src="{{ asset('img/backgrounds/joc4.png') }}" 
 										alt="Nivel 4" 
 										class="nivel-image">
+									<div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 rounded">
+										<span class="text-white font-bold text-lg">BLOQUEADO</span>
+									</div>
 								</div>
-							</a>
+							@endif
 						</div>
 					</div>
 				</div>
