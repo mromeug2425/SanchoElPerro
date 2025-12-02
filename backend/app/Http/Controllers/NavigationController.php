@@ -91,10 +91,10 @@ class NavigationController extends Controller
         $juego2Desbloqueado = true;
         
         // El juego 3 se desbloquea si se pasa el juego 3
-        $juego3Desbloqueado = $sesionesJuegosController->buscarVictoria(3);
+        $juego3Desbloqueado = $sesionesJuegosController->buscarVictoria(2);
         
         // El juego 4 se desbloquea si se pasa el juego 4
-        $juego4Desbloqueado = $sesionesJuegosController->buscarVictoria(1);
+        $juego4Desbloqueado = $sesionesJuegosController->buscarVictoria(3);
 
         return view('niveles', compact('juego1Desbloqueado', 'juego2Desbloqueado', 'juego3Desbloqueado', 'juego4Desbloqueado'));
     }    public function register()
