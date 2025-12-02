@@ -309,7 +309,7 @@ INSERT INTO preguntas (id_juego, pregunta, opcion_1, opcion_2, opcion_3, opcion_
 (2, 'Que numero es mayor: 0,99 o 1?', '0,99', '1', 'Son iguales', 'Ninguno', 2, NULL),
 (2, 'Cuanto es 2/3 de 90?', '45', '50', '55', '60', 4, NULL),
 (2, 'Cuanto es 200 x 0?', '0', '2', '20', '200', 1, NULL),
-(2, 'Cuanto es 8 + 8 / 4?', '10', '12', '14', '16', 2, NULL),
+(2, 'Cuanto es 8 + 8 / 4?', '10', '12', '14', '16', 1, NULL),
 (2, 'Cual es la raiz cuadrada de 144?', '10', '11', '12', '13', 3, NULL),
 (2, 'Cuanto es 9 + 10?', '18', '19', '20', '21', 2, NULL),
 (2, 'Cuanto es 2 x 25?', '45', '50', '55', '60', 2, NULL),

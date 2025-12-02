@@ -5,6 +5,10 @@ let tiempoLimite = 15;
 let tiempoRestante = 15;
 let intervaloTimer = null;
 let respuestaEsCorrecto = false;
+let respuestaCorrectas = 0;
+let respuestaIncorrectas = 0;
+let mondeasGandas = 0;
+let monedasPerdidas = 0;
 
 //  Posiciones de los personajes al empezar
 let posicionJugador = 3;
@@ -130,11 +134,13 @@ function verificarRespuesta(opcionSeleccionada) {
 
     if (respuestaCorrecta === opcionSeleccionada) {
         console.log("¡Respuesta correcta! ✅");
+        respuestaCorrectas++;
         mostrarPopup("¡CORRECTO!", "¡Excelente! Has acertado <[:{V", true);
         respuestaEsCorrecto = true;
         guardarRespuestaEnBD(pregunta, opcionSeleccionada, true);
     } else {
         console.log("Respuesta incorrecta ❌");
+        respuestaIncorrectas++;
         mostrarPopup("INCORRECTO", "La respuesta correcta era la opción " + pregunta.answer + ".", false);
         respuestaEsCorrecto = false;
         guardarRespuestaEnBD(pregunta, opcionSeleccionada, false);
@@ -146,14 +152,25 @@ function siguientePregunta() {
         mostrarPregunta(preguntaActual + 1);
     } else {
         console.log("Fin del juego");
+        console.log(`Respuestas correctas: ${respuestaCorrectas}, Respuestas incorrectas: ${respuestaIncorrectas}`);
 
-        // Calcular resultados para finalizar sesión
-        // En este juego simple no estamos trackeando monedas ganadas/gastadas por ahora
-        // pero podríamos añadirlo si fuera necesario.
-        // Asumimos ganado si se completan todas las preguntas (o podríamos poner un umbral)
-        finalizarSesionJuego(0, 0, true);
+        const totalPreguntas = preguntas.length;
+        const mitad = totalPreguntas / 2;
+        let monedasGanadas = 0;
+        let monedasGastadas = 0;
+        const ganado = respuestaCorrectas >= respuestaIncorrectas;
 
-        mostrarPopup("¡JUEGO COMPLETADO!", "¡Felicidades! Has respondido todas las preguntas.", true);
+        if (ganado) {
+            monedasGanadas = 115;
+        } else {
+            monedasGastadas = 74;
+        }
+
+        finalizarSesionJuego(monedasGanadas, monedasGastadas, ganado);
+
+        mostrarPopup(
+            "¡JUEGO COMPLETADO!", "¡Felicidades! Has respondido correctamente " + respuestaCorrectas + " de " + totalPreguntas + " preguntas.", true);
+
         setTimeout(function () {
             document.querySelector("#popup-resultado button").onclick = function () {
                 window.location.href = "/";
@@ -173,7 +190,15 @@ function reiniciarJuego() {
 }
 
 // Inicializar cuando carga la página
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
+    if(window.ensureSesionJuego) {
+        try { window.ensureSesionJuego(); } catch(e) {}
+
+    }
+    try {
+        if (window.sesionJuegoReady) {await window.sesionJuegoReady; }
+    } catch(e) {}  
+
     cargarPreguntas(2);
 
     // Event listener para las teclas de flechas en QTE
