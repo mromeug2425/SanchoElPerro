@@ -15,28 +15,25 @@ let posicionJugador = 3;
 let posicionCamello = 0;
 
 //  FUNCIONES DE PREGUNTAS 
-function cargarPreguntas(idJuego) {
+async function cargarPreguntas(idJuego) {
     const baseUrl = window.BASE_URL || window.location.origin;
     console.log("Cargando preguntas desde:", baseUrl + "/preguntas/" + idJuego);
-    fetch(baseUrl + "/preguntas/" + idJuego)
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (data) {
-            console.log("Preguntas cargadas:", data);
-            preguntas = data.preguntas || data;
-            tiempoLimite = data.tiempo || 15;
+    try {
+        const response = await fetch(baseUrl + "/preguntas/" + idJuego);
+        const data = await response.json();
+        console.log("Preguntas cargadas:", data);
+        preguntas = data.preguntas || data;
+        tiempoLimite = data.tiempo || 15;
 
-            if (preguntas.length > 0) {
-
-                console.log(preguntas);
-                medirImagenFondo();
-                mostrarPregunta(0);
-            }
-        })
-        .catch(function (error) {
-            console.error("Error al cargar preguntas:", error);
-        });
+        if (preguntas.length > 0) {
+            console.log(preguntas);
+            medirImagenFondo();
+            mostrarPregunta(0);
+        }
+        return preguntas;
+    } catch (error) {
+        console.error("Error al cargar preguntas:", error);
+    }
 }
 
 function iniciarTimer() {
@@ -153,6 +150,7 @@ function siguientePregunta() {
     } else {
         console.log("Fin del juego");
         console.log(`Respuestas correctas: ${respuestaCorrectas}, Respuestas incorrectas: ${respuestaIncorrectas}`);
+        console.log("sesionJuegoId antes de finalizar:", window.sesionJuegoId);
 
         const totalPreguntas = preguntas.length;
         const mitad = totalPreguntas / 2;
@@ -166,16 +164,19 @@ function siguientePregunta() {
             monedasGastadas = 74;
         }
 
-        finalizarSesionJuego(monedasGanadas, monedasGastadas, ganado);
-
         mostrarPopup(
             "¡JUEGO COMPLETADO!", "¡Felicidades! Has respondido correctamente " + respuestaCorrectas + " de " + totalPreguntas + " preguntas.", true);
 
-        setTimeout(function () {
-            document.querySelector("#popup-resultado button").onclick = function () {
+        document.querySelector("#popup-resultado button").onclick = async function () {
+            console.log("Click en botón popup, sesionJuegoId:", window.sesionJuegoId);
+            try {
+                await finalizarSesionJuego(monedasGanadas, monedasGastadas, ganado);
                 window.location.href = "/";
-            };
-        }, 100);
+            } catch (error) {
+                console.error("Error al finalizar sesión:", error);
+                window.location.href = "/";
+            }
+        };
     }
 }
 
@@ -191,15 +192,33 @@ function reiniciarJuego() {
 
 // Inicializar cuando carga la página
 document.addEventListener("DOMContentLoaded", async function () {
-    if(window.ensureSesionJuego) {
-        try { window.ensureSesionJuego(); } catch(e) {}
-
+    console.log("DOMContentLoaded iniciado");
+    console.log("window.ensureSesionJuego disponible?", typeof window.ensureSesionJuego);
+    
+    // Iniciar sesión sin esperar (igual que juego3)
+    if (window.ensureSesionJuego) { 
+        try { 
+            window.ensureSesionJuego(); 
+            console.log("ensureSesionJuego() llamado");
+        } catch (e) { 
+            console.error('Error al asegurar sesión:', e);
+        } 
     }
-    try {
-        if (window.sesionJuegoReady) {await window.sesionJuegoReady; }
-    } catch(e) {}  
+    
+    // Esperar a que la sesión esté lista
+    try { 
+        if (window.sesionJuegoReady) { 
+            console.log("Esperando sesionJuegoReady...");
+            await window.sesionJuegoReady;
+            console.log("sesionJuegoReady resuelto, sesionJuegoId:", window.sesionJuegoId); 
+        } 
+    } catch(e) {
+        console.error('Error esperando sesión:', e);
+    }  
 
-    cargarPreguntas(2);
+    console.log("Cargando preguntas...");
+    await cargarPreguntas(2);
+    console.log("Preguntas cargadas");
 
     // Event listener para las teclas de flechas en QTE
     document.addEventListener("keydown", function (event) {
