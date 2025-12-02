@@ -30,7 +30,16 @@ class NavigationController extends Controller
     public function tienda()
     {
         $usuario = auth()->user();
-        
+
+        // Verificar si el usuario tiene al menos 1 tiquet
+        if ($usuario->tiquets_tienda < 1) {
+            return redirect()->route('home')->with('error', 'No tienes tiquets para acceder a la tienda.');
+        }
+
+        // Restar un tiquet al usuario
+        $usuario->tiquets_tienda -= 1;
+        $usuario->save();
+
         $mejoras = Mejoras::where('activo', 1)
                         ->orderBy('id')
                         ->get();
@@ -65,7 +74,8 @@ class NavigationController extends Controller
         return view('tienda', [
             'mejoras' => $mejorasConPrecio,
             'nombreUsuario' => $nombreUsuario,
-            'monedas' => $monedasUsuario
+            'monedas' => $monedasUsuario,
+            'tiquets_actuales' => $usuario->tiquets_tienda
         ]);
     }
 

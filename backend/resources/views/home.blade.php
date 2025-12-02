@@ -31,7 +31,16 @@
 			<!-- Botones de Tienda y Juegos a la derecha (cuando está autenticado) -->
 			<div class="absolute right-8 bottom-32 z-20 flex flex-col gap-6">
 				<!-- Botón TIENDA -->
-				<x-boton color="#a855f7" text="Tienda" size="lg" height="xlarge" href="{{ route('tienda') }}" border_color="black" />
+				<x-boton 
+					id="boton-tienda" 
+					color="#a855f7" 
+					text="Tienda" 
+					size="lg" 
+					height="xlarge" 
+					border_color="black"
+					data-tiquets="{{ Auth::user()->tiquets_tienda ?? 0 }}"
+					data-href="{{ route('tienda') }}"
+				/>
 
 				<!-- Botón JUEGOS -->
 				<x-boton color="#3b82f6" text="Juegos" size="lg" height="xlarge" href="{{ route('niveles') }}" border_color="black" />
@@ -53,4 +62,8 @@
 	</div>
 
 	<script src="{{ asset('js/mejoras.js') }}"></script>
+
+	@auth
+	<script src="{{ asset('js/tiendaTikets.js') }}"></script>
+	@endauth
 @endsection
