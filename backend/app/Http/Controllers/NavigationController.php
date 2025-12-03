@@ -119,7 +119,8 @@ class NavigationController extends Controller
 
     public function juego4()
     {
-        return view('juego4', ['id_juego' => 4]);
+        $usuario = auth()->user();
+        return view('juego4', ['id_juego' => 4, 'usuario' => $usuario]);
     }
 
 }

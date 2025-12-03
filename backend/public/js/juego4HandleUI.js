@@ -10,7 +10,9 @@ let challengesCompleted = 0;
 let correctAnswers = 0;
 let totalChallenges = 4;
 let initialCoins = 0; // User's coins at game start
-let challengeAttempts = []; // Track all challenge attempts
+let challengeAttempts = []; // Track FIRST attempt per challenge (for coin calculation)
+let currentChallengeNumber = 0; // Track which challenge we're on
+let challengesAttempted = new Set(); // Track which challenge numbers have been attempted
 
 document.addEventListener("DOMContentLoaded", async function () {
     // Initialize session tracking
@@ -53,6 +55,9 @@ async function cargarInfoJuego(idJuego = 4) {
         tiempoRestante = tiempoLimite;
         challengesCompleted = 0;
         correctAnswers = 0;
+        currentChallengeNumber = 0; // Reset challenge counter
+        challengeAttempts = []; // Reset attempts tracking
+        challengesAttempted.clear(); // Reset attempted set
         console.log(
             "Game info loaded - Time:",
             tiempoLimite,
@@ -140,11 +145,16 @@ function tiempoAgotado() {
             game.correctOperations || []
         );
 
-        challengeAttempts.push({
-            correct: false,
-            timeout: true,
-            target: challenge.target,
-        });
+        // Track first attempt for remaining challenges as timeout failures
+        if (!challengesAttempted.has(currentChallengeNumber + i)) {
+            challengeAttempts.push({
+                correct: false,
+                timeout: true,
+                target: challenge.target,
+                challengeNumber: currentChallengeNumber + i,
+            });
+            challengesAttempted.add(currentChallengeNumber + i);
+        }
     }
 
     // Finalize session and redirect
@@ -343,7 +353,7 @@ function checkSolution() {
     const isCorrect = game.verifySolution(playerNumbers, playerOperations);
     const result = game.evaluateExpression(playerNumbers, playerOperations);
 
-    // Save to database
+    // Save to database (all attempts)
     guardarJuego4EnBD(
         challenge,
         playerNumbers,
@@ -354,17 +364,27 @@ function checkSolution() {
         game.correctOperations || []
     );
 
-    // Track locally
-    challengeAttempts.push({
-        correct: isCorrect,
-        playerNumbers: [...playerNumbers],
-        playerOperations: [...playerOperations],
-        target: challenge.target,
-    });
+    // Track FIRST attempt only for coin calculation
+    if (!challengesAttempted.has(currentChallengeNumber)) {
+        challengeAttempts.push({
+            correct: isCorrect,
+            playerNumbers: [...playerNumbers],
+            playerOperations: [...playerOperations],
+            target: challenge.target,
+            challengeNumber: currentChallengeNumber,
+        });
+        challengesAttempted.add(currentChallengeNumber);
+        console.log(
+            `First attempt for challenge ${currentChallengeNumber}: ${
+                isCorrect ? "CORRECT" : "WRONG"
+            }`
+        );
+    }
 
     if (isCorrect) {
         challengesCompleted++;
         correctAnswers++;
+        currentChallengeNumber++; // Move to next challenge
 
         if (challengesCompleted >= totalChallenges) {
             if (intervaloTimer) {
@@ -474,6 +494,6 @@ function showResultPopup(correct, total, coinsLost, isWinner) {
 
     // Redirect to home
     setTimeout(() => {
-        window.location.href = "/";
+        window.location.href = window.BASE_URL || "/";
     }, 500);
 }

@@ -1,4 +1,4 @@
-//  VARIABLES DE PREGUNTAS 
+//  VARIABLES DE PREGUNTAS
 let preguntas = [];
 let preguntaActual = 0;
 let tiempoLimite = 15;
@@ -14,7 +14,7 @@ let monedasPerdidas = 0;
 let posicionJugador = 3;
 let posicionCamello = 0;
 
-//  FUNCIONES DE PREGUNTAS 
+//  FUNCIONES DE PREGUNTAS
 async function cargarPreguntas(idJuego) {
     const baseUrl = window.BASE_URL || window.location.origin;
     console.log("Cargando preguntas desde:", baseUrl + "/preguntas/" + idJuego);
@@ -103,7 +103,13 @@ function mostrarPregunta(index) {
 
     const dialogoTexto = document.querySelector("#texto-pregunta");
     if (dialogoTexto) {
-        dialogoTexto.textContent = "Pregunta " + (index + 1) + "/" + preguntas.length + " - " + pregunta.pregunta;
+        dialogoTexto.textContent =
+            "Pregunta " +
+            (index + 1) +
+            "/" +
+            preguntas.length +
+            " - " +
+            pregunta.pregunta;
     }
 
     document.getElementById("opcion1").textContent = pregunta.opcion_1;
@@ -138,7 +144,11 @@ function verificarRespuesta(opcionSeleccionada) {
     } else {
         console.log("Respuesta incorrecta ❌");
         respuestaIncorrectas++;
-        mostrarPopup("INCORRECTO", "La respuesta correcta era la opción " + pregunta.answer + ".", false);
+        mostrarPopup(
+            "INCORRECTO",
+            "La respuesta correcta era la opción " + pregunta.answer + ".",
+            false
+        );
         respuestaEsCorrecto = false;
         guardarRespuestaEnBD(pregunta, opcionSeleccionada, false);
     }
@@ -149,7 +159,9 @@ function siguientePregunta() {
         mostrarPregunta(preguntaActual + 1);
     } else {
         console.log("Fin del juego");
-        console.log(`Respuestas correctas: ${respuestaCorrectas}, Respuestas incorrectas: ${respuestaIncorrectas}`);
+        console.log(
+            `Respuestas correctas: ${respuestaCorrectas}, Respuestas incorrectas: ${respuestaIncorrectas}`
+        );
         console.log("sesionJuegoId antes de finalizar:", window.sesionJuegoId);
 
         const totalPreguntas = preguntas.length;
@@ -165,18 +177,33 @@ function siguientePregunta() {
         }
 
         mostrarPopup(
-            "¡JUEGO COMPLETADO!", "¡Felicidades! Has respondido correctamente " + respuestaCorrectas + " de " + totalPreguntas + " preguntas.", true);
+            "¡JUEGO COMPLETADO!",
+            "¡Felicidades! Has respondido correctamente " +
+                respuestaCorrectas +
+                " de " +
+                totalPreguntas +
+                " preguntas.",
+            true
+        );
 
-        document.querySelector("#popup-resultado button").onclick = async function () {
-            console.log("Click en botón popup, sesionJuegoId:", window.sesionJuegoId);
-            try {
-                await finalizarSesionJuego(monedasGanadas, monedasGastadas, ganado);
-                window.location.href = "/";
-            } catch (error) {
-                console.error("Error al finalizar sesión:", error);
-                window.location.href = "/";
-            }
-        };
+        document.querySelector("#popup-resultado button").onclick =
+            async function () {
+                console.log(
+                    "Click en botón popup, sesionJuegoId:",
+                    window.sesionJuegoId
+                );
+                try {
+                    await finalizarSesionJuego(
+                        monedasGanadas,
+                        monedasGastadas,
+                        ganado
+                    );
+                    window.location.href = window.BASE_URL || "/";
+                } catch (error) {
+                    console.error("Error al finalizar sesión:", error);
+                    window.location.href = window.BASE_URL || "/";
+                }
+            };
     }
 }
 
@@ -193,28 +220,34 @@ function reiniciarJuego() {
 // Inicializar cuando carga la página
 document.addEventListener("DOMContentLoaded", async function () {
     console.log("DOMContentLoaded iniciado");
-    console.log("window.ensureSesionJuego disponible?", typeof window.ensureSesionJuego);
-    
+    console.log(
+        "window.ensureSesionJuego disponible?",
+        typeof window.ensureSesionJuego
+    );
+
     // Iniciar sesión sin esperar (igual que juego3)
-    if (window.ensureSesionJuego) { 
-        try { 
-            window.ensureSesionJuego(); 
+    if (window.ensureSesionJuego) {
+        try {
+            window.ensureSesionJuego();
             console.log("ensureSesionJuego() llamado");
-        } catch (e) { 
-            console.error('Error al asegurar sesión:', e);
-        } 
+        } catch (e) {
+            console.error("Error al asegurar sesión:", e);
+        }
     }
-    
+
     // Esperar a que la sesión esté lista
-    try { 
-        if (window.sesionJuegoReady) { 
+    try {
+        if (window.sesionJuegoReady) {
             console.log("Esperando sesionJuegoReady...");
             await window.sesionJuegoReady;
-            console.log("sesionJuegoReady resuelto, sesionJuegoId:", window.sesionJuegoId); 
-        } 
-    } catch(e) {
-        console.error('Error esperando sesión:', e);
-    }  
+            console.log(
+                "sesionJuegoReady resuelto, sesionJuegoId:",
+                window.sesionJuegoId
+            );
+        }
+    } catch (e) {
+        console.error("Error esperando sesión:", e);
+    }
 
     console.log("Cargando preguntas...");
     await cargarPreguntas(2);
@@ -228,10 +261,12 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 async function guardarRespuestaEnBD(pregunta, respuestaUsuario, acertada) {
     if (!window.sesionJuegoId && window.sesionJuegoReady) {
-        try { await window.sesionJuegoReady; } catch (e) {}
+        try {
+            await window.sesionJuegoReady;
+        } catch (e) {}
     }
     if (!window.sesionJuegoId) {
-        console.error('No hay sesión de juego activa');
+        console.error("No hay sesión de juego activa");
         return;
     }
 
@@ -240,18 +275,19 @@ async function guardarRespuestaEnBD(pregunta, respuestaUsuario, acertada) {
         opcion_1: pregunta.opcion_1,
         opcion_2: pregunta.opcion_2,
         opcion_3: pregunta.opcion_3,
-        opcion_4: pregunta.opcion_4
+        opcion_4: pregunta.opcion_4,
     };
 
     // Enviar al backend
-    fetch('/sesion-juego/guardar-respuesta', {
-        method: 'POST',
-        credentials: 'same-origin',
+    fetch("/sesion-juego/guardar-respuesta", {
+        method: "POST",
+        credentials: "same-origin",
         headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "X-Requested-With": "XMLHttpRequest",
+            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')
+                .content,
         },
         body: JSON.stringify({
             id_sesion_juegos: window.sesionJuegoId,
@@ -259,23 +295,28 @@ async function guardarRespuestaEnBD(pregunta, respuestaUsuario, acertada) {
             acertada: acertada,
             respuesta_usuario: respuestaUsuario,
             respuesta_correcta: pregunta.answer,
-            opciones: opciones
-        })
+            opciones: opciones,
+        }),
     })
-        .then(async response => {
+        .then(async (response) => {
             if (!response.ok) {
                 const text = await response.text();
-                console.error('Error al guardar respuesta (HTTP ' + response.status + '):', text);
-                throw new Error('HTTP ' + response.status);
+                console.error(
+                    "Error al guardar respuesta (HTTP " +
+                        response.status +
+                        "):",
+                    text
+                );
+                throw new Error("HTTP " + response.status);
             }
             return response.json();
         })
-        .then(data => {
+        .then((data) => {
             if (data.success) {
-                console.log('✅ Respuesta guardada en BD:', data.respuesta_id);
+                console.log("✅ Respuesta guardada en BD:", data.respuesta_id);
             } else {
-                console.error('❌ Error al guardar respuesta:', data.error);
+                console.error("❌ Error al guardar respuesta:", data.error);
             }
         })
-        .catch(error => console.error('❌ Error en la petición:', error));
+        .catch((error) => console.error("❌ Error en la petición:", error));
 }

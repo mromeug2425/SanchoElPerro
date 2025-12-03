@@ -238,7 +238,7 @@ async function siguientePregunta() {
             document.querySelector("#popup-resultado button").onclick =
                 async function () {
                     await finalizarSesionJuego(0, 74, false);
-                    window.location.href = "/";
+                    window.location.href = window.BASE_URL || "/";
                 };
         } else {
             // Mostrar popup de éxito
@@ -251,7 +251,7 @@ async function siguientePregunta() {
             document.querySelector("#popup-resultado button").onclick =
                 async function () {
                     await finalizarSesionJuego(115, 0, true);
-                    window.location.href = "/";
+                    window.location.href = window.BASE_URL || "/";
                 };
         }
     }

@@ -4,6 +4,13 @@
 
 @push('head')
 	<meta name="csrf-token" content="{{ csrf_token() }}">
+	<script>
+		// Expose user data to JavaScript
+		window.usuario = {
+			monedas: {{ $usuario->monedas ?? 0 }},
+			id: {{ $usuario->id ?? 0 }}
+		};
+	</script>
 @endpush
 
 @php
