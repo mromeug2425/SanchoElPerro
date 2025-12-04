@@ -38,7 +38,7 @@ class LoginController extends Controller
 		]);
 
 		$user = Usuario::where('nombre_usuario', $credentials['username'])->first();
-		
+
 		if ($user) {
 			$openSessions = Sesiones::where('id_usuario', $user->id)
 				->whereNull('duracion')
@@ -104,24 +104,50 @@ class LoginController extends Controller
 	{
 		$sesionId = session('current_sesion_id');
 		
+		Log::info('Logout initiated', ['id' => $sesionId]);
+		
 		if ($sesionId) {
 			try {
 				$sesion = Sesiones::find($sesionId);
 				
+				Log::info('Session found', [
+					'sesion' => $sesion ? $sesion->toArray() : null,
+					'duracion_is_null' => $sesion ? ($sesion->duracion === null) : false
+				]);
+				
 				if ($sesion && $sesion->duracion === null) {
-					// Calculate duration using Carbon
-					$createdAt = Carbon::parse($sesion->createdAt);
-					$now = Carbon::now();
-					$durationSeconds = $now->diffInSeconds($createdAt);
-					
-					// Convert seconds to TIME format (HH:MM:SS)
-					$hours = floor($durationSeconds / 3600);
-					$minutes = floor(($durationSeconds % 3600) / 60);
-					$seconds = $durationSeconds % 60;
-					$durationTime = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
-					
-					$sesion->duracion = $durationTime;
-					$sesion->save();
+				// Calculate duration using Carbon with proper timezone handling
+				$createdAt = Carbon::parse($sesion->createdAt);
+				$now = Carbon::now();
+				
+				// Use absolute value to ensure positive duration
+				$durationSeconds = abs($now->diffInSeconds($createdAt, false));
+				
+				// Ensure we have a valid positive duration
+				if ($durationSeconds < 0) {
+					$durationSeconds = 0;
+				}
+				
+				// Convert seconds to TIME format (HH:MM:SS)
+				$hours = floor($durationSeconds / 3600);
+				$minutes = floor(($durationSeconds % 3600) / 60);
+				$seconds = $durationSeconds % 60;
+				$durationTime = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+				
+				Log::info('Calculated duration', [
+					'createdAt' => $createdAt,
+					'now' => $now,
+					'durationSeconds' => $durationSeconds,
+					'durationTime' => $durationTime
+				]);
+				
+				$sesion->duracion = $durationTime;
+				$saved = $sesion->save();
+				
+				Log::info('Session save result', [
+					'saved' => $saved,
+					'duracion_after_save' => $sesion->duracion
+				]);
 				}
 			} catch (\Exception $e) {
 				Log::error('Error closing session: ' . $e->getMessage());
@@ -129,9 +155,9 @@ class LoginController extends Controller
 		}
 
 		Auth::logout();
-		
+
 		$request->session()->invalidate();
-		
+
 		$request->session()->regenerateToken();
 
 		return redirect()->route('home')->with('success', '¡Hasta pronto!');

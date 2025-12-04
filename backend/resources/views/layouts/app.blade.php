@@ -25,8 +25,11 @@
 
 	<script>
 		window.BASE_URL = '{{ url("/") }}';
-		window.API_PATH = '{{ env("API_PATH", "") }}'; // Keep for backward compatibility if needed
-	</script>		@stack('styles')
+		window.API_PATH = '{{ env("API_PATH", "") }}';
+	</script>
+	
+	@stack('head')
+	@stack('styles')
 	</head>
 	<body class="antialiased bg-gray-900">
 		<div class="min-h-screen w-full flex items-center justify-center p-4">

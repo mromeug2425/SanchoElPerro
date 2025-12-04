@@ -6,6 +6,19 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\NavigationController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\MejorasController;
+use App\Http\Controllers\SesionesController;
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/sesion-juego/iniciar', [SesionesController::class, 'iniciarSesionJuego'])
+         ->name('sesion.juego.iniciar');
+    
+    Route::post('/sesion-juego/finalizar', [SesionesController::class, 'finalizarSesionJuego'])
+         ->name('sesion.juego.finalizar');
+
+     Route::post('/sesion-juego/guardar-respuesta', [SesionesController::class, 'guardarRespuesta'])
+          ->name('sesion.juego.guardar.respuesta');
+});
 
 Route::get('/', [NavigationController::class, 'home'])->name('home');
 
@@ -31,5 +44,7 @@ Route::post('/register', [RegisterController::class, 'register']);
 // Preguntas
 Route::get('preguntas/{id_juego?}', [PreguntasController::class, 'preguntasMostradas']);
 
+// Obtener información del juego (tiempo y cantidad de preguntas)
+Route::get('juego/info/{id_juego}', [PreguntasController::class, 'obtenerInfoJuego']);
 // Compra de mejoras
 Route::post('/mejoras/comprar', [MejorasController::class, 'comprar'])->name('mejoras.comprar')->middleware('auth');

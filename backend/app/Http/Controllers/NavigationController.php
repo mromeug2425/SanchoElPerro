@@ -6,6 +6,7 @@ use App\Models\Mejoras;
 use Illuminate\Http\Request;
 use App\Models\UsuariosMejoras;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\SesionesJuegosController;
 
 class NavigationController extends Controller
 {
@@ -30,7 +31,16 @@ class NavigationController extends Controller
     public function tienda()
     {
         $usuario = auth()->user();
-        
+
+        // Verificar si el usuario tiene al menos 1 tiquet
+        if ($usuario->tiquets_tienda < 1) {
+            return redirect()->route('home')->with('error', 'No tienes tiquets para acceder a la tienda.');
+        }
+
+        // Restar un tiquet al usuario
+        $usuario->tiquets_tienda -= 1;
+        $usuario->save();
+
         $mejoras = Mejoras::where('activo', 1)
                         ->orderBy('id')
                         ->get();
@@ -65,38 +75,52 @@ class NavigationController extends Controller
         return view('tienda', [
             'mejoras' => $mejorasConPrecio,
             'nombreUsuario' => $nombreUsuario,
-            'monedas' => $monedasUsuario
+            'monedas' => $monedasUsuario,
+            'tiquets_actuales' => $usuario->tiquets_tienda
         ]);
     }
 
     public function niveles()
-    {
-        return view('niveles');
-    }
+    {   
+        $sesionesJuegosController = new SesionesJuegosController();
+        
+        // El juego 1 siempre está desbloqueado
+        $juego1Desbloqueado = true;
+        
+        // El juego 2 se desbloquea si se pasa el juego 2
+        $juego2Desbloqueado = true;
+        
+        // El juego 3 se desbloquea si se pasa el juego 3
+        $juego3Desbloqueado = $sesionesJuegosController->buscarVictoria(2);
+        
+        // El juego 4 se desbloquea si se pasa el juego 4
+        $juego4Desbloqueado = $sesionesJuegosController->buscarVictoria(3);
 
-    public function register()
+        return view('niveles', compact('juego1Desbloqueado', 'juego2Desbloqueado', 'juego3Desbloqueado', 'juego4Desbloqueado'));
+    }    public function register()
     {
         return view('register');
     }
 
     public function juego1()
     {
-        return view('juego1');
+        return view('juego1', ['id_juego' => 1]);
     }
 
     public function juego2()
     {
-        return view('juego2');
+        return view('juego2', ['id_juego' => 2]);
     }
 
     public function juego3()
     {
-        return view('juego3');
+        return view('juego3', ['id_juego' => 3]);
     }
 
     public function juego4()
     {
-        return view('juego4');
+        $usuario = auth()->user();
+        return view('juego4', ['id_juego' => 4, 'usuario' => $usuario]);
     }
 
 }
