@@ -37,16 +37,17 @@ class MiniGameSancho {
         };
         const baseUrl = window.BASE_URL || window.location.origin;
         this.images.redEnemies[0].src =
-            baseUrl + "/img/personajes/camello/camel.png";
+            baseUrl + "public/img/personajes/camello/camel.png";
         this.images.redEnemies[1].src =
-            baseUrl + "/img/personajes/camello/camel_moving.png";
+            baseUrl + "public/img/personajes/camello/camel_moving.png";
         this.images.redEnemies[2].src =
-            baseUrl + "/img/personajes/camello/camel_zombie.png";
+            baseUrl + "public/img/personajes/camello/camel_zombie.png";
         this.images.greenEnemy.src =
-            baseUrl + "/img/personajes/sobrina/sobrina.png";
+            baseUrl + "public/img/personajes/sobrina/sobrina.png";
         this.images.player.src =
-            baseUrl + "/img/personajes/player/player_shovel.png";
-        this.images.bullet.src = baseUrl + "/img/personajes/player/shovel.png";
+            baseUrl + "public/img/personajes/player/player_shovel.png";
+        this.images.bullet.src =
+            baseUrl + "public/img/personajes/player/shovel.png";
         this.imagesLoaded = false;
 
         Promise.all([

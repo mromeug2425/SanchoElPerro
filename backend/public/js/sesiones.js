@@ -226,18 +226,18 @@ async function guardarJuego4EnBD(
         .then((data) => {
             if (data.success) {
                 console.log(
-                    "✅ Game 4: Respuesta guardada en BD:",
+                    "Game 4: Respuesta guardada en BD:",
                     data.respuesta_id
                 );
             } else {
                 console.error(
-                    "❌ Game 4: Error al guardar respuesta:",
+                    "Game 4: Error al guardar respuesta:",
                     data.error
                 );
             }
         })
         .catch((error) =>
-            console.error("❌ Game 4: Error en la petición:", error)
+            console.error("Game 4: Error en la petición:", error)
         );
 }
 

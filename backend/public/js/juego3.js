@@ -160,7 +160,7 @@ function verificarRespuesta(opcionSeleccionada) {
     guardarRespuestaEnBD(pregunta, opcionSeleccionada, esCorrecta);
 
     if (esCorrecta) {
-        console.log("¡Respuesta correcta! ✅");
+        console.log("¡Respuesta correcta!");
         respuestasCorrectas++;
         mostrarPopup(
             "¡CORRECTO!",
@@ -168,7 +168,7 @@ function verificarRespuesta(opcionSeleccionada) {
             true
         );
     } else {
-        console.log("Respuesta incorrecta ❌");
+        console.log("Respuesta incorrecta");
         respuestasIncorrectas++;
         mostrarPopup(
             "INCORRECTO",
@@ -265,9 +265,9 @@ function inicializarDragAndDrop() {
         dropZone.addEventListener("dragenter", handleDragOver, false);
         dropZone.addEventListener("dragleave", handleDragLeave, false);
         dropZone.addEventListener("drop", handleDrop, false);
-        console.log("✅ Drag & Drop inicializado");
+        console.log("Drag & Drop inicializado");
     } else {
-        console.error("❌ No se encontró drop-zone");
+        console.error("No se encontró drop-zone");
     }
 }
 
@@ -321,9 +321,9 @@ function handleDrop(e) {
     e.stopPropagation();
     e.preventDefault();
 
-    console.log("📦 Drop event triggered");
-    console.log("📦 dragAndDropHabilitado:", dragAndDropHabilitado);
-    console.log("📦 opcionArrastrada:", opcionArrastrada);
+    console.log("Drop event triggered");
+    console.log("dragAndDropHabilitado:", dragAndDropHabilitado);
+    console.log("opcionArrastrada:", opcionArrastrada);
 
     const dropZone = document.getElementById("drop-zone");
     if (dropZone) {
@@ -331,16 +331,14 @@ function handleDrop(e) {
     }
 
     const opcion = opcionArrastrada || e.dataTransfer.getData("text/plain");
-    console.log("📦 Opción final:", opcion);
+    console.log("Opción final:", opcion);
 
     if (opcion && dragAndDropHabilitado) {
         dragAndDropHabilitado = false;
         deshabilitarOpciones();
         verificarRespuesta(parseInt(opcion));
     } else {
-        console.error(
-            "❌ No se pudo obtener la opción o drag está deshabilitado"
-        );
+        console.error("No se pudo obtener la opción o drag está deshabilitado");
     }
 
     return false;
@@ -423,10 +421,10 @@ async function guardarRespuestaEnBD(pregunta, respuestaUsuario, acertada) {
         })
         .then((data) => {
             if (data.success) {
-                console.log("✅ Respuesta guardada en BD:", data.respuesta_id);
+                console.log("Respuesta guardada en BD:", data.respuesta_id);
             } else {
-                console.error("❌ Error al guardar respuesta:", data.error);
+                console.error("Error al guardar respuesta:", data.error);
             }
         })
-        .catch((error) => console.error("❌ Error en la petición:", error));
+        .catch((error) => console.error("Error en la petición:", error));
 }

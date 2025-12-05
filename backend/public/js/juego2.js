@@ -136,13 +136,13 @@ function verificarRespuesta(opcionSeleccionada) {
     const respuestaCorrecta = parseInt(pregunta.answer);
 
     if (respuestaCorrecta === opcionSeleccionada) {
-        console.log("¡Respuesta correcta! ✅");
+        console.log("¡Respuesta correcta!");
         respuestaCorrectas++;
         mostrarPopup("¡CORRECTO!", "¡Excelente! Has acertado <[:{V", true);
         respuestaEsCorrecto = true;
         guardarRespuestaEnBD(pregunta, opcionSeleccionada, true);
     } else {
-        console.log("Respuesta incorrecta ❌");
+        console.log("Respuesta incorrecta");
         respuestaIncorrectas++;
         mostrarPopup(
             "INCORRECTO",
@@ -314,10 +314,10 @@ async function guardarRespuestaEnBD(pregunta, respuestaUsuario, acertada) {
         })
         .then((data) => {
             if (data.success) {
-                console.log("✅ Respuesta guardada en BD:", data.respuesta_id);
+                console.log("Respuesta guardada en BD:", data.respuesta_id);
             } else {
-                console.error("❌ Error al guardar respuesta:", data.error);
+                console.error("Error al guardar respuesta:", data.error);
             }
         })
-        .catch((error) => console.error("❌ Error en la petición:", error));
+        .catch((error) => console.error("Error en la petición:", error));
 }
