@@ -23,6 +23,7 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/', [NavigationController::class, 'home'])->name('home');
 
 Route::get('/tienda', [NavigationController::class, 'tienda'])->name('tienda');
+Route::get('/python', [NavigationController::class, 'python'])->name('python');
 
 Route::get('/niveles', [NavigationController::class, 'niveles'])->name('niveles');
 

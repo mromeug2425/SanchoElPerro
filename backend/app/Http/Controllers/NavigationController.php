@@ -97,7 +97,8 @@ class NavigationController extends Controller
         $juego4Desbloqueado = $sesionesJuegosController->buscarVictoria(3);
 
         return view('niveles', compact('juego1Desbloqueado', 'juego2Desbloqueado', 'juego3Desbloqueado', 'juego4Desbloqueado'));
-    }    public function register()
+    }    
+    public function register()
     {
         return view('register');
     }
@@ -121,6 +122,11 @@ class NavigationController extends Controller
     {
         $usuario = auth()->user();
         return view('juego4', ['id_juego' => 4, 'usuario' => $usuario]);
+    }
+
+     public function python()
+    {
+        return view('python');
     }
 
 }

@@ -11,6 +11,7 @@
 		<link href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap" rel="stylesheet">
 		
 		<script src="https://cdn.tailwindcss.com"></script>
+		<script src="https://cdn.jsdelivr.net/pyodide/dev/full/pyodide.js"></script>
 		<script>
 			tailwind.config = {
 				theme: {
