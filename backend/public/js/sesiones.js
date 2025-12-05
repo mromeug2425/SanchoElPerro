@@ -257,6 +257,3 @@ window.addEventListener("beforeunload", function (e) {
         navigator.sendBeacon("/sesion-juego/finalizar", blob);
     }
 });
-
-// Llamar a finalizarSesionJuego() cuando termine el juego
-// Ejemplo: finalizarSesionJuego(100, 50, true);

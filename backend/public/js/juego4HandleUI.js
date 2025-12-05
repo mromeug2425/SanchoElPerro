@@ -9,13 +9,12 @@ let clueUsed = false;
 let challengesCompleted = 0;
 let correctAnswers = 0;
 let totalChallenges = 4;
-let initialCoins = 0; // User's coins at game start
-let challengeAttempts = []; // Track FIRST attempt per challenge (for coin calculation)
-let currentChallengeNumber = 0; // Track which challenge we're on
-let challengesAttempted = new Set(); // Track which challenge numbers have been attempted
+let initialCoins = 0;
+let challengeAttempts = [];
+let currentChallengeNumber = 0;
+let challengesAttempted = new Set();
 
 document.addEventListener("DOMContentLoaded", async function () {
-    // Initialize session tracking
     if (window.ensureSesionJuego) {
         try {
             await window.ensureSesionJuego();
@@ -24,7 +23,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
-    // Wait for session to be ready
     try {
         if (window.sesionJuegoReady) {
             await window.sesionJuegoReady;
@@ -35,10 +33,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     game = new MathChallengeGame();
 
-    // Fetch user's current coins
     await fetchUserCoins();
 
-    // Load game info (fixed: was 3, should be 4)
     await cargarInfoJuego(4);
 });
 
@@ -55,9 +51,9 @@ async function cargarInfoJuego(idJuego = 4) {
         tiempoRestante = tiempoLimite;
         challengesCompleted = 0;
         correctAnswers = 0;
-        currentChallengeNumber = 0; // Reset challenge counter
-        challengeAttempts = []; // Reset attempts tracking
-        challengesAttempted.clear(); // Reset attempted set
+        currentChallengeNumber = 0;
+        challengeAttempts = [];
+        challengesAttempted.clear();
         console.log(
             "Game info loaded - Time:",
             tiempoLimite,
@@ -72,15 +68,9 @@ async function cargarInfoJuego(idJuego = 4) {
 
 async function fetchUserCoins() {
     try {
-        // Get user coins from current authenticated user
-        // Since we don't have a specific API endpoint, we'll fetch from window or set to 0
-        // The backend will handle the actual coin deduction based on user's current coins
         const usuario = window.usuario || {};
         initialCoins = usuario.monedas || 0;
         console.log("Game 4: Initial coins:", initialCoins);
-
-        // Note: If coins aren't available client-side, backend will use current user coins
-        // This is just for displaying to user during game
     } catch (error) {
         console.error("Error fetching user coins:", error);
         initialCoins = 0;
@@ -353,18 +343,16 @@ function checkSolution() {
     const isCorrect = game.verifySolution(playerNumbers, playerOperations);
     const result = game.evaluateExpression(playerNumbers, playerOperations);
 
-    // Save to database (all attempts)
     guardarJuego4EnBD(
         challenge,
         playerNumbers,
         playerOperations,
         isCorrect,
-        false, // not a timeout
+        false,
         game.correctNumbers || [],
         game.correctOperations || []
     );
 
-    // Track FIRST attempt only for coin calculation
     if (!challengesAttempted.has(currentChallengeNumber)) {
         challengeAttempts.push({
             correct: isCorrect,
@@ -384,7 +372,7 @@ function checkSolution() {
     if (isCorrect) {
         challengesCompleted++;
         correctAnswers++;
-        currentChallengeNumber++; // Move to next challenge
+        currentChallengeNumber++;
 
         if (challengesCompleted >= totalChallenges) {
             if (intervaloTimer) {
@@ -392,7 +380,6 @@ function checkSolution() {
                 intervaloTimer = null;
             }
 
-            // Game complete - finalize session
             finalizarYRedirigir();
         } else if (challengesCompleted === 2) {
             alert(
@@ -422,16 +409,13 @@ function checkSolution() {
 }
 
 async function finalizarYRedirigir() {
-    // Calculate results
     const totalChallenges = challengeAttempts.length;
     const correctCount = challengeAttempts.filter((a) => a.correct).length;
     const incorrectCount = totalChallenges - correctCount;
     const incorrectPercentage = incorrectCount / totalChallenges;
 
-    // Calculate coin loss (percentage of incorrect answers)
     const coinsLost = Math.floor(initialCoins * incorrectPercentage);
 
-    // Determine if won (>= 50% correct)
     const isWinner = correctCount >= totalChallenges / 2;
 
     console.log("Game 4 Summary:", {
@@ -444,16 +428,10 @@ async function finalizarYRedirigir() {
         isWinner: isWinner,
     });
 
-    // Show result popup
     showResultPopup(correctCount, totalChallenges, coinsLost, isWinner);
 
-    // Finalize session
     try {
-        await finalizarSesionJuego(
-            0, // monedas_ganadas (always 0 for Game 4)
-            coinsLost, // monedas_perdidas
-            isWinner // ganado
-        );
+        await finalizarSesionJuego(0, coinsLost, isWinner);
 
         console.log("Game 4: Session finalized successfully");
     } catch (error) {
@@ -461,9 +439,6 @@ async function finalizarYRedirigir() {
     }
 }
 
-/**
- * Show final result popup with game stats
- */
 function showResultPopup(correct, total, coinsLost, isWinner) {
     const percentage = Math.round((correct / total) * 100);
 
@@ -477,7 +452,6 @@ function showResultPopup(correct, total, coinsLost, isWinner) {
             `Monedas perdidas: ${coinsLost}\n` +
             `¡Has ganado 1 ticket!`;
 
-        // Show win animation
         showWinAnimation();
         setTimeout(() => hideWinAnimation(), 2000);
     } else {
@@ -489,10 +463,7 @@ function showResultPopup(correct, total, coinsLost, isWinner) {
             `Necesitas al menos ${Math.ceil(total / 2)} aciertos.`;
     }
 
-    // Show alert
     alert(title + "\n\n" + message);
-
-    // Redirect to home
     setTimeout(() => {
         window.location.href = window.BASE_URL || "/";
     }, 500);
