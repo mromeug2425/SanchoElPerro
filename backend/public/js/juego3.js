@@ -387,7 +387,8 @@ async function guardarRespuestaEnBD(pregunta, respuestaUsuario, acertada) {
     };
 
     // Enviar al backend
-    fetch("/sesion-juego/guardar-respuesta", {
+    baseUrl = window.BASE_URL || window.location.origin;
+    fetch(`${baseUrl}/sesion-juego/guardar-respuesta`, {
         method: "POST",
         credentials: "same-origin",
         headers: {
