@@ -241,20 +241,3 @@ async function guardarJuego4EnBD(
             console.error("Game 4: Error en la petición:", error)
         );
 }
-
-// Manejar el cierre inesperado de la página
-window.addEventListener("beforeunload", function (e) {
-    if (window.sesionJuegoId) {
-        // Usar sendBeacon para enviar datos de forma asíncrona antes de cerrar
-        const data = JSON.stringify({
-            sesion_juego_id: window.sesionJuegoId,
-            monedas_ganadas: 0,
-            monedas_gastadas: 0,
-            ganado: false,
-        });
-
-        // sendBeacon es más confiable que fetch para eventos beforeunload
-        const blob = new Blob([data], { type: "application/json" });
-        navigator.sendBeacon("/sesion-juego/finalizar", blob);
-    }
-});

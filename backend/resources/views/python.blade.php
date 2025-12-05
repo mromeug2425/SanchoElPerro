@@ -24,11 +24,12 @@
 
             await pyodide.loadPackage(['pandas', 'scikit-learn', 'matplotlib']);
 
-            const csvResponse = await fetch('/data/dataset_sessions.csv');
+            const baseUrl = window.BASE_URL || window.location.origin;
+            const csvResponse = await fetch(`${baseUrl}/data/dataset_sessions.csv`);
             const csvText = await csvResponse.text();
             pyodide.FS.writeFile('/dataset_sessions.csv', csvText);
 
-            const pyResponse = await fetch('/data/rtc_browser.py');
+            const pyResponse = await fetch(`${baseUrl}/data/rtc_browser.py`);
             const pyCode = await pyResponse.text();
             pyodide.runPython(pyCode);
 
