@@ -280,6 +280,7 @@ async function guardarRespuestaEnBD(pregunta, respuestaUsuario, acertada) {
 
     // Enviar al backend
     const baseUrl = window.BASE_URL || window.location.origin;
+    console.log(`${baseUrl}/sesion-juego/guardar-respuesta`);
     fetch(`${baseUrl}/sesion-juego/guardar-respuesta`, {
         method: "POST",
         credentials: "same-origin",

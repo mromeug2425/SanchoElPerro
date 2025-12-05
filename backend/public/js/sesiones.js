@@ -191,6 +191,7 @@ async function guardarJuego4EnBD(
 
     // Send to backend
     const baseUrl = window.BASE_URL || window.location.origin;
+    console.log(`${baseUrl}/sesion-juego/guardar-respuesta`);
     fetch(`${baseUrl}/sesion-juego/guardar-respuesta`, {
         method: "POST",
         credentials: "same-origin",
@@ -203,7 +204,7 @@ async function guardarJuego4EnBD(
         },
         body: JSON.stringify({
             id_sesion_juegos: window.sesionJuegoId,
-            id_pregunta: null, // NULL for Game 4
+            id_pregunta: null,
             acertada: isCorrect,
             respuesta_usuario: respuestaUsuario,
             respuesta_correcta: respuestaCorrect,
